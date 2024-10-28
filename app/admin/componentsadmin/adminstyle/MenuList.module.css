@@ -1,0 +1,15 @@
+.table{
+    max-width: 75rem;
+    border-collapse: collapse;
+}
+.table th{
+    padding: 0.5rem;
+    text-align: left;
+    border: 1px solid #130f0f;
+    border-radius: 2rem;
+}
+.table td{
+    padding: 0.5rem;
+    text-align: left;
+    border: 1px solid #130f0f;
+}

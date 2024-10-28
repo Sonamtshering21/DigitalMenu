@@ -1,0 +1,88 @@
+.sidebar {
+    width: 220px; /* Adjust width as needed */
+    background-color: #f4f4f4;
+    padding: 20px;
+    position: fixed; /* Keeps sidebar fixed on the left */
+    height: 100vh; /* Full viewport height */
+    overflow-y: auto;
+    border-right: 1px solid #ddd;
+  }
+  /*layout css*/
+ /* admin.module.css */
+
+.container {
+    display: flex; /* Use flexbox for layout */
+    flex-direction: column;
+}
+
+.sidebar {
+    margin-top: 3.5rem;
+    width: 250px; /* Set a fixed width for the sidebar */
+    background-color: #f0f0f0; /* Background color for sidebar */
+    height: 100vh; /* Full height for sidebar */
+}
+
+.innerdisplay {
+    margin-left: 15rem;
+    flex: 1; /* Take remaining space */
+    padding: 20px; /* Padding around the content */
+    background-color: #ffffff; /* Background color for the content area */
+    overflow-y: auto; /* Allow scrolling if content overflows */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+  .sidebar h1 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-top: 20px;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .sidebar ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .sidebar li {
+    margin: 10px 0;
+    font-size: 1rem;
+    color: #1f1414;
+    cursor: pointer;
+  }
+  
+  .sidebar li:hover {
+    color: #007bff; /* Highlight color on hover */
+  }
+
+  /* admin.module.css */
+.sidebar {
+  /* Sidebar general styling */
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar li {
+  margin: 10px 0;
+}
+
+.sidebar a {
+  color: black;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.sidebar a:hover {
+  color: green; /* Hover color */
+}
+
+.activeLink {
+  color: green; /* Active link color */
+  font-weight: bold; /* Optional: Make the active link bold */
+}
