@@ -47,14 +47,15 @@ export default function RootLayout({ children }) {
 }
 */
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+//import localFont from "next/font/local";
 // import Header from '../components/Header';
 // import Footer from '../components/Footer';
 import { AuthProvider } from './Providers'; // Ensure this is set up properly
 import { SelectedItemsProvider } from './context/SelectedItemsContext';
 
-import "./globals.css";
 
+import "./globals.css";
+/*
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -65,7 +66,7 @@ const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
   weight: "100 900",
-});
+}); */
 
 export const metadata: Metadata = {
   title: "DigitalMenu",
@@ -80,7 +81,16 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+     
+     <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+    <body className="font-outfit"> {/* Use the Outfit font here */}
         <SelectedItemsProvider>
           <AuthProvider>
             {children}
