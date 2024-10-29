@@ -1,11 +1,16 @@
 import { connectPostgreSQL } from "../lib/db";
-
 import pool from "@/lib/db";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";    
 import { AuthOptions } from "next-auth"; // Import the AuthOptions type
+import { JWT } from "next-auth/jwt"; // Import JWT type
+//import { Session } from "next-auth"; // Import Session type
 
-export const authOptions: AuthOptions = { // Type the authOptions variable
+interface CustomToken extends JWT {
+  id: string; // Extend the JWT type to include user ID
+}
+
+export const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -14,7 +19,6 @@ export const authOptions: AuthOptions = { // Type the authOptions variable
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        // Check if credentials are provided
         if (!credentials) {
           throw new Error("No credentials provided");
         }
@@ -24,7 +28,6 @@ export const authOptions: AuthOptions = { // Type the authOptions variable
         try {
           await connectPostgreSQL(); // Connect to PostgreSQL
 
-          // Fetch the user from PostgreSQL
           const { rows } = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
           const user = rows[0]; // Get the first user from the result
 
@@ -46,6 +49,24 @@ export const authOptions: AuthOptions = { // Type the authOptions variable
       },
     }),
   ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id; // Assign user id to token
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      const customToken = token as CustomToken; // Assert that token is of CustomToken type
+
+      if (session.user) {
+        session.user.id = customToken.id; // Assign user ID to session
+      } else {
+        session.user = { id: customToken.id }; // Initialize session.user with ID if undefined
+      }
+      return session;
+    },
+  },
   session: {
     strategy: "jwt",
   },

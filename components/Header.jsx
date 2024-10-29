@@ -8,6 +8,7 @@ import { useSession, signOut } from "next-auth/react";
 
 const Header = () => {
   const { data: session } = useSession();
+  const userId = session?.user?.id; 
 
   const handleSignOut = async () => {
     await signOut({ callbackUrl: '/menu' }); // Redirect after sign out, if desired
@@ -25,8 +26,18 @@ const Header = () => {
         {session ? (
           <>
             <li>
-              <Link href='/admin' className='hover:text-blue-400'>Admin</Link>
+                    <Link href={`/dashboard/${userId}`} className='hover:text-blue-400'>
+                        Dashboard
+                    </Link>
+                </li>
+              <li>
+              <Link href='/admin' className='hover:text-blue-400'>Dash board</Link>
             </li>
+            <li>
+              <Link href='/qr-codes' className='hover:text-blue-400'>qrcode</Link>
+            </li>
+           
+           
             <li>
               <span>{session.user.name}</span>
               <button

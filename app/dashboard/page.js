@@ -1,132 +1,25 @@
-'use client'
-import { useState } from "react";
-import Header from "@/components/Header";
-import styles from './dashboard.module.css';
+// /app/dashboard/page.js
+'use client';
 
-export default function Dashboard() {
-  const [formData, setFormData] = useState({
-    companyName: '',
-    address: '',
-    contactInfo: '',
-    description: '',
-    socialLinks: ''
-  });
+import { useSession } from "next-auth/react";
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation'; // Import useRouter to redirect
 
-  const [errors, setErrors] = useState({});
+export default function DashboardLanding() {
+  const { data: session } = useSession();
+  const router = useRouter();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const validationErrors = {};
-    
-    // Validation
-    if (!formData.companyName) validationErrors.companyName = "Company name is required.";
-    if (!formData.address) validationErrors.address = "Address is required.";
-    if (!formData.contactInfo) validationErrors.contactInfo = "Contact info is required.";
-    if (!formData.description) validationErrors.description = "Description is required.";
-
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
+  useEffect(() => {
+    // If there's a session and the user ID exists, redirect to the user's specific dashboard
+    if (session?.user?.id) {
+      router.push(`/dashboard/${session.user.id}`);
     }
-
-    // Handle successful submission (e.g., send data to the server)
-    console.log("Form submitted:", formData);
-    // Clear form
-    setFormData({
-      companyName: '',
-      address: '',
-      contactInfo: '',
-      description: '',
-      socialLinks: ''
-    });
-    setErrors({});
-  };
+  }, [session, router]);
 
   return (
-    <>
-      <Header />
-      <div className={styles.admindashboard}>
-        <h1>Welcome To Digital Menu</h1>
-        <h2>Please Complete the below process to avail the service:</h2>
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="companyName">
-              Company Name / Restaurant Name *
-              <input
-                type="text"
-                id="companyName"
-                name="companyName"
-                value={formData.companyName}
-                onChange={handleChange}
-                required
-              />
-              {errors.companyName && <p className={styles.error}>{errors.companyName}</p>}
-            </label>
-          </div>
-          <div>
-            <label htmlFor="address">
-              Address of the Company *
-              <input
-                type="text"
-                id="address"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                required
-              />
-              {errors.address && <p className={styles.error}>{errors.address}</p>}
-            </label>
-          </div>
-          <div>
-            <label htmlFor="contactInfo">
-              Contact Info of the Company *
-              <input
-                type="text"
-                id="contactInfo"
-                name="contactInfo"
-                value={formData.contactInfo}
-                onChange={handleChange}
-                required
-              />
-              {errors.contactInfo && <p className={styles.error}>{errors.contactInfo}</p>}
-            </label>
-          </div>
-          <div>
-            <label htmlFor="description">
-              Description of the Company *
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                required
-              />
-              {errors.description && <p className={styles.error}>{errors.description}</p>}
-            </label>
-          </div>
-          <div>
-            <label htmlFor="socialLinks">
-              Link/Website/TikTok/Social Media
-              <input
-                type="text"
-                id="socialLinks"
-                name="socialLinks"
-                value={formData.socialLinks}
-                onChange={handleChange}
-              />
-            </label>
-          </div>
-          <button type="submit">Submit</button>
-        </form>
-      </div>
-    </>
+    <div>
+      <h1>Welcome to the Dashboard</h1>
+      <p>Redirecting to your dashboard...</p>
+    </div>
   );
 }
