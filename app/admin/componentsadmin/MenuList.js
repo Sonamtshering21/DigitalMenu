@@ -58,7 +58,7 @@ const MenuList = () => {
   };
 
   // Function to handle adding a new menu item
-  
+  /*
   const handleAddItem = async (e) => {
     e.preventDefault();
 
@@ -83,8 +83,39 @@ const MenuList = () => {
       console.error('Error adding item:', error);
     }
   };
+  */
+  const handleAddItem = async (e) => {
+    e.preventDefault();
   
-
+    // Validate the newItem object
+    if (newItem.dish_name && newItem.price && newItem.image_url) {
+      try {
+        const response = await fetch('/api/menu', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ ...newItem, user_id: userId }),
+        });
+  
+        if (response.ok) {
+          const addedItem = await response.json();
+          // Ensure price is set as a number
+          const newMenuItem = { ...addedItem, price: parseFloat(addedItem.price) };
+  
+          setMenuItems((prevItems) => [...prevItems, newMenuItem]);
+          setNewItem({ dish_name: '', description: '', price: '', image_url: '' });
+          setShowForm(false);
+        } else {
+          console.error('Failed to add the item');
+        }
+      } catch (error) {
+        console.error('Error adding item:', error);
+      }
+    } else {
+      console.error('Please fill in all fields.');
+    }
+  };
   // Function to handle input changes and track changes
   const handleInputChange = (id, field, value) => {
     setMenuItems((prevItems) =>

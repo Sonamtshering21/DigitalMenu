@@ -34,7 +34,7 @@ const OrderedListPage = () => {
 
     return (
         <div>
-            <h1>Your Orders</h1>
+            
             {orders.length > 0 ? (
                 <table>
                     <thead>
