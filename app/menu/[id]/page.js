@@ -8,18 +8,25 @@ import Image from 'next/image';
 
 const MenuItemPage = () => {
   const router = useRouter();
-  const { id } = router.query; // Get the id from the query params
   const [item, setItem] = useState(null);
-  
+  const [loading, setLoading] = useState(true); // State to track loading
+  const id = router.query?.id; // Use optional chaining to access id safely
+
   useEffect(() => {
     if (id) {
       const fetchMenuItem = async () => {
+        setLoading(true); // Start loading
         try {
           const response = await fetch(`/api/menu/${id}`); // Fetch data for the specific menu item
+          if (!response.ok) {
+            throw new Error('Failed to fetch');
+          }
           const data = await response.json();
           setItem(data);
         } catch (error) {
           console.error('Error fetching menu item:', error);
+        } finally {
+          setLoading(false); // End loading regardless of success or failure
         }
       };
 
@@ -27,8 +34,12 @@ const MenuItemPage = () => {
     }
   }, [id]);
 
-  if (!item) {
+  if (loading) {
     return <p>Loading...</p>; // Show loading state while fetching data
+  }
+
+  if (!item) {
+    return <p>Item not found.</p>; // Handle case when item is not found
   }
 
   return (

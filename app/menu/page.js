@@ -13,6 +13,8 @@ const MenuPage = () => {
     const [tableNumber, setTableNumber] = useState('');
     const [error, setError] = useState(null);
     const [showError, setShowError] = useState(false);
+    const [tokenId, setTokenId] = useState('');
+    
     const router = useRouter();
     const searchParams = useSearchParams();
     const scannedUserId = searchParams.get('user_id');
@@ -80,9 +82,23 @@ const MenuPage = () => {
         router.push(`/menu/selectedmenu?user_id=${userId}&table=${tableNumber}`);
     };
 
+    const handleSubmittoken = () => {
+        // Logic to track the order using the token ID
+        console.log('Tracking order for token ID:', tokenId);
+        if (!tokenId) {
+            setShowError(true);
+            return;
+        }
+
+        setShowError(false);
+        // Redirect to order details using the token ID
+        router.push(`/menu/tracker/${tokenId}`); // Change this line to link to the dynamic route
+    };
+
     return (
         <div className={styles.menuarea}>
-            <h1>Our Menu</h1>
+            <h1><strong>Our Menu</strong></h1>
+           
             {(!scannedUserId || !scannedTableNumber) && (
                 <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
                     <input
@@ -103,7 +119,7 @@ const MenuPage = () => {
                 </form>
             )}
             {error && <div className={styles.error}>{error}</div>}
-            {showError && <div className={styles.error}>Please enter a valid Table Number.</div>}
+            {showError && <div className={styles.error}>Please enter a valid Table Number or Token ID.</div>}
             
             <table className={styles.table}>
                 <thead>
@@ -156,6 +172,20 @@ const MenuPage = () => {
             )}
 
             <button type="button" className={styles.btn} onClick={handleSubmit}>View</button>
+            <div>
+                <label htmlFor="tokenId">Order Status:</label>
+                <input
+                    type="text"
+                    id="tokenId"
+                    value={tokenId}
+                    onChange={(e) => setTokenId(e.target.value)} // Use setTokenId directly
+                    placeholder="Enter your token ID"
+                    required
+                />
+                <button type="button" className={styles.btn} onClick={handleSubmittoken}>
+                    Track Order
+                </button>
+            </div> 
         </div>
     );
 };
