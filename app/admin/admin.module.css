@@ -1,7 +1,8 @@
 .sidebar {
-    width: 220px; /* Adjust width as needed */
-    background-color: #f4f4f4;
-    padding: 20px;
+    width: 5rem; /* Adjust width as needed */
+    max-width: 15rem;
+    background-color: green;
+    padding: 2rem;
     position: fixed; /* Keeps sidebar fixed on the left */
     height: 100vh; /* Full viewport height */
     overflow-y: auto;
@@ -59,8 +60,9 @@
   }
 
   /* admin.module.css */
-.sidebar {
+.Sidebar {
   /* Sidebar general styling */
+  position: relative;
 }
 
 .sidebar ul {

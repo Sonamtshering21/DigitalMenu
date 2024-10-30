@@ -1,17 +1,21 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSelectedItems } from '../../context/SelectedItemsContext';
+import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import styles from '../menu.module.css';
 
 const SelectedMenuPage = () => {
+  const searchParams = useSearchParams();
+  const tableNumber = searchParams.get('table'); // Retrieve tableNumber from URL
+  const userId = searchParams.get('user_id');
   const { selectedItems, setSelectedItems } = useSelectedItems();
   const [loading, setLoading] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
   const [token, setToken] = useState('');
-  const [enteredToken, setEnteredToken] = useState(''); // State for entered token
-  const [showTokenPrompt, setShowTokenPrompt] = useState(false); // State to control token prompt visibility
+  const [enteredToken, setEnteredToken] = useState('');
+  const [showTokenPrompt, setShowTokenPrompt] = useState(false);
 
   // Generate a unique token for each customer session
   useEffect(() => {
@@ -27,16 +31,15 @@ const SelectedMenuPage = () => {
   }, []);
 
   const handleRemoveItem = (id) => {
-    setSelectedItems(prevItems => prevItems.filter(item => item.id !== id));
+    setSelectedItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
   const handleUpdateQuantity = (id, quantity) => {
-    setSelectedItems(prevItems =>
-      prevItems.map(item => item.id === id ? { ...item, quantity } : item)
+    setSelectedItems((prevItems) =>
+      prevItems.map((item) => (item.id === id ? { ...item, quantity } : item))
     );
   };
 
-  // Submit handler
   const handleSubmit = async () => {
     if (selectedItems.length === 0) {
       setSubmitMessage('No items selected to submit.');
@@ -48,7 +51,6 @@ const SelectedMenuPage = () => {
   };
 
   const handleConfirmToken = async () => {
-    // Check if the entered token matches the generated token
     if (enteredToken !== token) {
       setSubmitMessage('Token does not match. Please enter the correct token.');
       return;
@@ -64,9 +66,10 @@ const SelectedMenuPage = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          token, // Customer's unique session token
-          selectedItems, // Items selected by the customer
-          tableNumber: '5', // Replace with actual table number logic if needed
+          token,
+          selectedItems,
+          tableNumber,
+          userId,
         }),
       });
 
@@ -74,10 +77,10 @@ const SelectedMenuPage = () => {
 
       if (result.success) {
         setSubmitMessage('Order saved successfully!');
-        setSelectedItems([]); // Clear items after successful submission
-        sessionStorage.removeItem('customerToken'); // Clear token if not needed after submission
-        setEnteredToken(''); // Clear entered token
-        setShowTokenPrompt(false); // Hide the token prompt
+        setSelectedItems([]);
+        sessionStorage.removeItem('customerToken');
+        setEnteredToken('');
+        setShowTokenPrompt(false);
       } else {
         setSubmitMessage(`Error saving order: ${result.error}`);
       }
@@ -92,7 +95,6 @@ const SelectedMenuPage = () => {
     <div>
       <h1>Your Selected Items</h1>
 
-      {/* Display the unique token ID for the customer */}
       {token && (
         <div style={{ backgroundColor: '#f0f0f0', padding: '10px', borderRadius: '5px' }}>
           <p>Your unique token ID: <strong>{token}</strong></p>
@@ -114,10 +116,10 @@ const SelectedMenuPage = () => {
               </tr>
             </thead>
             <tbody>
-              {selectedItems.map(item => (
+              {selectedItems.map((item) => (
                 <tr key={item.id}>
                   <td>
-                    <Image src={item.image_url || "/placeholder-image.jpg"} alt={item.dish_name} width={100} height={100} />
+                    <Image src={item.image_url || '/placeholder-image.jpg'} alt={item.dish_name} width={100} height={100} />
                   </td>
                   <td>{item.dish_name}</td>
                   <td>{item.description}</td>
@@ -138,14 +140,12 @@ const SelectedMenuPage = () => {
             </tbody>
           </table>
 
-          {/* Submit button to save selected items */}
           <button onClick={handleSubmit} disabled={loading}>
             {loading ? 'Submitting...' : 'Submit Order'}
           </button>
 
           {submitMessage && <p>{submitMessage}</p>}
 
-          {/* Token input prompt modal */}
           {showTokenPrompt && (
             <div style={{
               position: 'fixed',
@@ -182,4 +182,11 @@ const SelectedMenuPage = () => {
   );
 };
 
-export default SelectedMenuPage;
+// Wrap your component in Suspense
+const SuspenseWrapper = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <SelectedMenuPage />
+  </Suspense>
+);
+
+export default SuspenseWrapper;

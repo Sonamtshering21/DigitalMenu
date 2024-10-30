@@ -77,7 +77,7 @@ const MenuPage = () => {
         }
 
         setShowError(false);
-        router.push(`/menu/selectedmenu?table=${tableNumber}`);
+        router.push(`/menu/selectedmenu?user_id=${userId}&table=${tableNumber}`);
     };
 
     return (
@@ -87,7 +87,7 @@ const MenuPage = () => {
                 <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
                     <input
                         type="text"
-                        placeholder="Enter User ID"
+                        placeholder="Enter Company ID"
                         value={userId}
                         onChange={(e) => setUserId(e.target.value)}
                         required
