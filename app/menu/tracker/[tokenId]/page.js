@@ -1,4 +1,5 @@
-"use client";
+"use client"; // Ensure this component is treated as a client component
+
 import React, { useEffect, useState, Suspense } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -6,7 +7,7 @@ import styles from '../../menu.module.css';
 
 const TokenPage = () => {
     const router = useRouter();
-    const { tokenId } = useParams();
+    const { tokenId } = useParams(); // Extract tokenId from the URL parameters
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -30,6 +31,32 @@ const TokenPage = () => {
 
         fetchOrder();
     }, [tokenId]);
+
+    const handleCancelItem = async (itemId) => {
+        const token = tokenId; // Use tokenId from URL
+        try {
+            const response = await fetch(`/api/orders/delete/${token}/${itemId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Update the order state to remove the canceled item
+                setOrder((prevOrder) => ({
+                    ...prevOrder,
+                    selected_items: prevOrder.selected_items.filter(item => item.id !== itemId),
+                }));
+            } else {
+                console.error('Error canceling item:', result.error);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
 
     if (loading) {
         return <p>Loading...</p>;
@@ -72,7 +99,9 @@ const TokenPage = () => {
                         <th>Description</th>
                         <th>Quantity</th>
                         <th>Price</th>
-                        <th>Action</th>
+                        {order.order_status === 'N/A' && (
+                            <th>Action</th>
+                        )}
                     </tr>
                 </thead>
                 <tbody>
@@ -90,7 +119,13 @@ const TokenPage = () => {
                             <td>{item.description}</td>
                             <td>{item.quantity}</td>
                             <td>${item.price.toFixed(2)}</td>
-                            <td>Cancel</td>
+                            
+                                {order.order_status === 'N/A' && (
+                                   <td> <button onClick={() => handleCancelItem(item.id)} >
+                                        Cancel
+                                    </button></td>
+                                )}
+                            
                         </tr>
                     ))}
                 </tbody>
@@ -100,12 +135,11 @@ const TokenPage = () => {
             <p>
                 Status: {order.order_status === "N/A" ? 'Pending' : 'Approved'}
             </p>
-                {order.order_status === 'Confrimed' ? (
-                    <p>Progress: {order.order_progress === "N/A" ? 'Preparing' : 'Ready to Eat'}</p>
-                ) : null}
+            {order.order_status === 'Confirmed' ? (
+                <p>Progress: {order.order_progress === "N/A" ? 'Preparing' : 'Ready to Eat'}</p>
+            ) : null}
             <p>Once Approved you cannot delete</p>
             <p className={styles.totalPrice}><strong>Total Price:</strong> ${totalPrice.toFixed(2)}</p>
-
 
             {/* Table for Order Details */}
             <h2>Order Details</h2>

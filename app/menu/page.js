@@ -213,7 +213,7 @@ const MenuPage = () => {
             </div> 
             {/* Display company details */}
             {companyDetails && (
-                <div>
+                <div className={styles.des}>
                     <p>{companyDetails.description}</p>
                     <p>Address: {companyDetails.address}</p>
                     <p>Contact: {companyDetails.contact_info}</p>

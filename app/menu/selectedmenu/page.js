@@ -204,9 +204,8 @@ const SelectedMenuPage = () => {
 
 // Wrap your component in Suspense
 const SuspenseWrapper = () => (
-  <Suspense fallback={<div>Loading...</div>}>
+  <Suspense fallback={<div >Loading...</div>}>
     <SelectedMenuPage />
   </Suspense>
 );
-
 export default SuspenseWrapper;

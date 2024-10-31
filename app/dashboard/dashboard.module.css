@@ -50,4 +50,8 @@
     background:lightcoral;
   }
   
- 
+ .redirect{
+  justify-content: center;
+  text-align: center;
+  margin-top: 10rem;
+ }

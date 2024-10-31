@@ -4,6 +4,7 @@
 import { useSession } from "next-auth/react";
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation'; // Import useRouter to redirect
+import style from './dashboard.module.css';
 
 export default function DashboardLanding() {
   const { data: session } = useSession();
@@ -17,7 +18,7 @@ export default function DashboardLanding() {
   }, [session, router]);
 
   return (
-    <div>
+    <div className={style.redirect}>
       <h1>Welcome to the Dashboard</h1>
       <p>Redirecting to your dashboard...</p>
     </div>

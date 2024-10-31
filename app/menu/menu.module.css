@@ -3,6 +3,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    text-align: center;
     background: white;
     height: 100%;
     width: 100%;
@@ -10,7 +11,7 @@
     gap: 1rem;
 }
 .table{
-    max-width: 75rem;
+    max-width: 85rem;
     border-collapse: collapse;
 }
 .table th{
@@ -30,8 +31,10 @@
     border: 0.2rem solid rgb(218, 44, 44);
     color: rgb(218, 44, 44);
 }
-
-
+.des{
+    margin-top: 2rem;
+    gap: 1rem;
+}
 
 
 
