@@ -8,8 +8,8 @@ export async function POST(req) {
 
         // Insert order using token, table number, user_id, and store selected items as JSON
         const result = await client.query(
-            'INSERT INTO orders (token, table_number, user_id, selected_items) VALUES ($1, $2, $3, $4) RETURNING *',
-            [token, tableNumber, userId, JSON.stringify(selectedItems)] // Include userId in the values
+            'INSERT INTO orders (token, table_number, user_id, selected_items, order_status, order_progress) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+            [token, tableNumber, userId, JSON.stringify(selectedItems), 'N/A', 'N/A'] // Include userId and default values in the values array
         );
 
         client.release(); // Release the client back to the pool

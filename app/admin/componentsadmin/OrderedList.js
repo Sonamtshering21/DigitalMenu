@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 
-
 const OrderedListPage = () => {
     const { data: session, status } = useSession(); // Get the current session
     const [orders, setOrders] = useState([]); // State to store orders
@@ -12,7 +11,7 @@ const OrderedListPage = () => {
         const fetchOrders = async () => {
             if (!userId) return; // Exit if userId is not available
             try {
-                const response = await fetch(`/api/orders/${userId}`); // Fetch from the correct API endpoint
+                const response = await fetch(`/api/orders/${userId}`); // Fetch orders for the user
                 if (response.ok) {
                     const data = await response.json();
                     setOrders(data); // Update orders state
@@ -31,27 +30,57 @@ const OrderedListPage = () => {
     if (status === "loading") {
         return <p>Loading...</p>;
     }
+    
+    
+
+    // Function to update order status or progress based on token
+    const updateOrderField = async (tokenId, field, value) => {
+        try {
+            const response = await fetch(`/api/orders/token/${tokenId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ [field]: value }),
+            });
+    
+            if (response.ok) {
+                // Update the local state to reflect the change
+                setOrders((prevOrders) =>
+                    prevOrders.map((order) =>
+                        order.token === tokenId ? { ...order, [field]: value } : order
+                    )
+                );
+            } else {
+                console.error(`Failed to update order ${field}`);
+            }
+        } catch (error) {
+            console.error(`Error updating order ${field}:`, error);
+        }
+    };
 
     return (
         <div>
-            
+            <p>Track Order: Enter Token No</p>
             {orders.length > 0 ? (
                 <table>
                     <thead>
                         <tr>
-                            <th>Order ID</th>
+                            <th>Si No.</th>
+                            <th>Token Id</th>
                             <th>Table Number</th>
-                            <th>Token</th>
                             <th>Created At</th>
                             <th>Selected Items</th>
+                            <th>Status</th>
+                            <th>Progress</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {orders.map(order => (
+                        {orders.map((order, index) => (
                             <tr key={order.id}>
-                                <td>{order.id}</td>
-                                <td>{order.table_number}</td>
+                                <td>{index + 1}</td>
                                 <td>{order.token}</td>
+                                <td>{order.table_number}</td>
                                 <td>{new Date(order.created_at).toLocaleString()}</td>
                                 <td>
                                     <ul>
@@ -67,6 +96,32 @@ const OrderedListPage = () => {
                                             </li>
                                         ))}
                                     </ul>
+                                </td>
+                                <td>
+                                    {/* Make status clickable */}
+                                    {order.order_status === 'N/A' ? (
+                                        <span
+                                            onClick={() => updateOrderField(order.token, 'order_status', 'Confirmed')}
+                                            style={{ color: 'blue', cursor: 'pointer' }}
+                                        >
+                                            N/A
+                                        </span>
+                                    ) : (
+                                        order.order_status
+                                    )}
+                                </td>
+                                <td>
+                                    {/* Make progress clickable */}
+                                    {order.order_progress === 'N/A' ? (
+                                        <span
+                                            onClick={() => updateOrderField(order.token, 'order_progress', 'Ready to Eat')}
+                                            style={{ color: 'blue', cursor: 'pointer' }}
+                                        >
+                                            N/A
+                                        </span>
+                                    ) : (
+                                        order.order_progress
+                                    )}
                                 </td>
                             </tr>
                         ))}

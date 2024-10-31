@@ -2,7 +2,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import styles from '../../menu.module.css'; // Ensure you have the correct styles
+import styles from '../../menu.module.css';
 
 const TokenPage = () => {
     const router = useRouter();
@@ -53,9 +53,14 @@ const TokenPage = () => {
         }
     }
 
+    // Calculate the total price
+    const totalPrice = selectedItems.reduce((total, item) => {
+        return total + item.price * item.quantity;
+    }, 0);
+
     return (
         <div className={styles.menuarea}>
-            <h1>Order Details for Token ID: {tokenId}</h1>
+            <h1>Order Details for Token ID: <strong>{tokenId}</strong></h1>
 
             {/* Table for Selected Items */}
             <h2>Ordered Status</h2>
@@ -67,7 +72,7 @@ const TokenPage = () => {
                         <th>Description</th>
                         <th>Quantity</th>
                         <th>Price</th>
-                        <th>Status</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -85,11 +90,22 @@ const TokenPage = () => {
                             <td>{item.description}</td>
                             <td>{item.quantity}</td>
                             <td>${item.price.toFixed(2)}</td>
-                            <td>N/A</td>
+                            <td>Cancel</td>
                         </tr>
                     ))}
                 </tbody>
             </table>
+
+            {/* Display Total Price */}
+            <p>
+                Status: {order.order_status === "N/A" ? 'Pending' : 'Approved'}
+            </p>
+                {order.order_status === 'Confrimed' ? (
+                    <p>Progress: {order.order_progress === "N/A" ? 'Preparing' : 'Ready to Eat'}</p>
+                ) : null}
+            <p>Once Approved you cannot delete</p>
+            <p className={styles.totalPrice}><strong>Total Price:</strong> ${totalPrice.toFixed(2)}</p>
+
 
             {/* Table for Order Details */}
             <h2>Order Details</h2>
@@ -100,8 +116,8 @@ const TokenPage = () => {
                         <td>{order.table_number}</td>
                     </tr>
                     <tr>
-                        <td><strong>User ID:</strong></td>
-                        <td>{order.user_id}</td>
+                        <td><strong>Payment:</strong></td>
+                        <td>Not Done</td>
                     </tr>
                 </tbody>
             </table>

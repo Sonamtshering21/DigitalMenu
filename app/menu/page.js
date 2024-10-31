@@ -14,6 +14,7 @@ const MenuPage = () => {
     const [error, setError] = useState(null);
     const [showError, setShowError] = useState(false);
     const [tokenId, setTokenId] = useState('');
+    const [companyDetails, setCompanyDetails] = useState(null);
     
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -81,6 +82,24 @@ const MenuPage = () => {
         setShowError(false);
         router.push(`/menu/selectedmenu?user_id=${userId}&table=${tableNumber}`);
     };
+    useEffect(() => {
+        const fetchCompanyDetails = async () => {
+            if (!userId) return;
+
+            try {
+                const response = await fetch(`/api/company?user_id=${userId}`);
+                if (!response.ok) throw new Error('Failed to fetch company details');
+
+                const data = await response.json();
+                setCompanyDetails(data);
+            } catch (error) {
+                console.error('Error fetching company details:', error);
+                setError('Error fetching company details. Please try again later.');
+            }
+        };
+
+        fetchCompanyDetails();
+    }, [userId]);
 
     const handleSubmittoken = () => {
         // Logic to track the order using the token ID
@@ -98,7 +117,13 @@ const MenuPage = () => {
     return (
         <div className={styles.menuarea}>
             <h1><strong>Our Menu</strong></h1>
-           
+              {/* Display company details */}
+              {companyDetails && (
+                <div>
+                    <h2>Welcome to <strong>{companyDetails.company_name}</strong></h2>
+                    <p>{companyDetails.social_links}</p>
+                </div>
+            )}
             {(!scannedUserId || !scannedTableNumber) && (
                 <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
                     <input
@@ -186,6 +211,14 @@ const MenuPage = () => {
                     Track Order
                 </button>
             </div> 
+            {/* Display company details */}
+            {companyDetails && (
+                <div>
+                    <p>{companyDetails.description}</p>
+                    <p>Address: {companyDetails.address}</p>
+                    <p>Contact: {companyDetails.contact_info}</p>
+                </div>
+            )}
         </div>
     );
 };
