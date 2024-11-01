@@ -1,7 +1,6 @@
 'use client';
 import { useSession } from 'next-auth/react';
 import React, { useState, useEffect } from 'react';
-//import Link from 'next/link';
 import Image from 'next/image';
 import styles from './adminstyle/MenuList.module.css';
 
@@ -57,33 +56,6 @@ const MenuList = () => {
     }
   };
 
-  // Function to handle adding a new menu item
-  /*
-  const handleAddItem = async (e) => {
-    e.preventDefault();
-
-    try {
-      const response = await fetch('/api/menu', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ ...newItem, user_id: userId }),
-      });
-
-      if (response.ok) {
-        const addedItem = await response.json();
-        setMenuItems((prevItems) => [...prevItems, addedItem]);
-        setNewItem({ dish_name: '', description: '', price: '', image_url: '' });
-        setShowForm(false);
-      } else {
-        console.error('Failed to add the item');
-      }
-    } catch (error) {
-      console.error('Error adding item:', error);
-    }
-  };
-  */
   const handleAddItem = async (e) => {
     e.preventDefault();
   
@@ -100,7 +72,6 @@ const MenuList = () => {
   
         if (response.ok) {
           const addedItem = await response.json();
-          // Ensure price is set as a number
           const newMenuItem = { ...addedItem, price: parseFloat(addedItem.price) };
   
           setMenuItems((prevItems) => [...prevItems, newMenuItem]);
@@ -116,7 +87,7 @@ const MenuList = () => {
       console.error('Please fill in all fields.');
     }
   };
-  // Function to handle input changes and track changes
+
   const handleInputChange = (id, field, value) => {
     setMenuItems((prevItems) =>
       prevItems.map((item) => 
@@ -153,7 +124,6 @@ const MenuList = () => {
       });
 
       if (response.ok) {
-        // Update local state without full page reload
         setMenuItems((prevItems) => 
           prevItems.map(item => ({
             ...item,
@@ -177,7 +147,7 @@ const MenuList = () => {
       <table className={styles.table}>
         <thead>
           <tr>
-            <th>ID</th>
+            <th>Si No</th> {/* Changed header to "No" */}
             <th>Image</th>
             <th>Dish Name</th>
             <th>Description</th>
@@ -186,9 +156,9 @@ const MenuList = () => {
           </tr>
         </thead>
         <tbody>
-          {menuItems.map(item => (
+          {menuItems.map((item, index) => (
             <tr key={item.id}>
-              <td>{item.id}</td>
+              <td>{index + 1}</td> {/* Displaying sequential number */}
               <td>
                 <Image src={item.image_url || "/placeholder-image.jpg"} alt={item.dish_name} width={100} height={100} />
               </td>
@@ -215,9 +185,9 @@ const MenuList = () => {
                 )}
               </td>
               <td>
-             {isEditingAll ? (
+                {isEditingAll ? (
                   <input
-                    type="text" // Change type to "text" to allow deleting the first number
+                    type="text"
                     value={item.price !== undefined && item.price !== null ? item.price : ''}
                     onChange={(e) => {
                       const newValue = e.target.value; // Get the new input value as a string
@@ -240,20 +210,17 @@ const MenuList = () => {
         </tbody>
       </table>
 
-      {/* Button to toggle edit mode for the entire table */}
-      <button onClick={() => setIsEditingAll(!isEditingAll)}>
+      <button onClick={() => setIsEditingAll(!isEditingAll)} className={styles.btn}>
         {isEditingAll ? 'Cancel Editing' : 'Edit All Items'}
       </button>
       {isEditingAll && (
-        <button onClick={handleSaveAllEdits}>Save All Edits</button>
+        <button onClick={handleSaveAllEdits} className={styles.btn}>Save All Edits</button>
       )}
 
-      {/* Button to show/hide the form */}
-      <button onClick={() => setShowForm(!showForm)}>
+      <button onClick={() => setShowForm(!showForm)} className={styles.btn}>
         {showForm ? 'Cancel' : 'Add Menu Item'}
       </button>
 
-      {/* Conditionally render the form based on showForm state */}
       {showForm && (
         <form onSubmit={handleAddItem} className={styles.addItemForm}>
           <input
@@ -284,7 +251,7 @@ const MenuList = () => {
             onChange={(e) => setNewItem({ ...newItem, image_url: e.target.value })}
             required
           />
-          <button type="submit">Add Menu Item</button>
+          <button type="submit" className={styles.btn}>Add Menu Item</button>
         </form>
       )}
     </div>

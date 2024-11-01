@@ -13,3 +13,17 @@
     text-align: left;
     border: 1px solid #130f0f;
 }
+.btn{
+    background-color: #4CAF50; /* Green background */
+    border: none; /* No border */
+    color: white; /* White text */
+    padding: 4px 20px; /* Padding around text */
+    text-align: center; /* Center text */
+    text-decoration: none; /* No underline */
+    display: inline-block; /* Align inline */
+    
+    margin: 10px 10px; /* Margin around button */
+    cursor: pointer; /* Pointer cursor on hover */
+    border-radius: 5px; /* Rounded corners */
+   
+  }

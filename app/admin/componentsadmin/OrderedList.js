@@ -1,20 +1,27 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
+import style from './adminstyle/OrderedList.module.css';
 
 const OrderedListPage = () => {
     const { data: session, status } = useSession(); // Get the current session
-    const [orders, setOrders] = useState([]); // State to store orders
+    const [orders, setOrders] = useState([]); // State to store all orders
+    const [filteredOrders, setFilteredOrders] = useState([]); // State to store filtered orders based on search
+    const [orderCounts, setOrderCounts] = useState({ totalOrders: 0, deliveredOrders: 0, pendingOrders: 0 }); // State to store counts
+    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // State to store selected date
+    const [searchToken, setSearchToken] = useState(''); // State for search input
     const userId = session?.user?.id; // Get user ID from the session
 
     useEffect(() => {
         const fetchOrders = async () => {
             if (!userId) return; // Exit if userId is not available
             try {
-                const response = await fetch(`/api/orders/${userId}`); // Fetch orders for the user
+                const response = await fetch(`/api/orders/${userId}?date=${selectedDate}`); // Fetch orders for the user based on the selected date
                 if (response.ok) {
                     const data = await response.json();
-                    setOrders(data); // Update orders state
+                    setOrders(data.orders); // Update orders state
+                    setOrderCounts(data.counts); // Update order counts state
+                    setFilteredOrders(data.orders); // Initialize filtered orders
                 } else {
                     console.error('Failed to fetch orders');
                 }
@@ -24,14 +31,25 @@ const OrderedListPage = () => {
         };
 
         fetchOrders(); // Call the function to fetch orders
-    }, [userId]); // Re-run effect if userId changes
+    }, [userId, selectedDate]); // Re-run effect if userId or selectedDate changes
+
+    useEffect(() => {
+        // Filter orders based on search input
+        if (searchToken) {
+            const lowercasedToken = searchToken.toLowerCase();
+            const filtered = orders.filter(order => 
+                order.token.toString().toLowerCase().includes(lowercasedToken)
+            );
+            setFilteredOrders(filtered); // Update filtered orders state
+        } else {
+            setFilteredOrders(orders); // Reset to all orders if search input is empty
+        }
+    }, [searchToken, orders]); // Re-run effect if searchToken or orders change
 
     // Loading state
     if (status === "loading") {
         return <p>Loading...</p>;
     }
-    
-    
 
     // Function to update order status or progress based on token
     const updateOrderField = async (tokenId, field, value) => {
@@ -43,9 +61,14 @@ const OrderedListPage = () => {
                 },
                 body: JSON.stringify({ [field]: value }),
             });
-    
+
             if (response.ok) {
                 // Update the local state to reflect the change
+                setFilteredOrders((prevOrders) =>
+                    prevOrders.map((order) =>
+                        order.token === tokenId ? { ...order, [field]: value } : order
+                    )
+                );
                 setOrders((prevOrders) =>
                     prevOrders.map((order) =>
                         order.token === tokenId ? { ...order, [field]: value } : order
@@ -59,10 +82,37 @@ const OrderedListPage = () => {
         }
     };
 
+    const today = new Date();
+    const formattedDate = `${today.getMonth() + 1}/${today.getDate()}/${today.getFullYear()}`; // Format: MM/DD/YYYY
+
     return (
         <div>
-            <p>Track Order: Enter Token No</p>
-            {orders.length > 0 ? (
+            <div className={style.statustop}>
+                <div>
+                    <p>Search Order:</p>
+                    <input
+                        type="text"
+                        value={searchToken}
+                        onChange={(e) => setSearchToken(e.target.value)} // Update search input
+                        placeholder="Enter Token Id"
+                    />
+                    </div>
+                    <div>
+                    <p>Order's Date:</p>
+                    <input
+                        type="date"
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)} // Update selected date
+                    />
+                </div>
+                <div className={style.statusdetails}>
+                    <p>Total Orders: <span>{orderCounts.totalOrders}</span></p>
+                    <p>Delivered Orders: <span>{orderCounts.deliveredOrders}</span></p>
+                    <p>Pending Orders: <span>{orderCounts.pendingOrders}</span></p>
+                </div>
+            </div>
+
+            {filteredOrders.length > 0 ? (
                 <table>
                     <thead>
                         <tr>
@@ -76,7 +126,7 @@ const OrderedListPage = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {orders.map((order, index) => (
+                        {filteredOrders.map((order, index) => (
                             <tr key={order.id}>
                                 <td>{index + 1}</td>
                                 <td>{order.token}</td>
