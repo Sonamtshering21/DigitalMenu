@@ -7,7 +7,6 @@
     background: white;
     height: 100%;
     width: 100%;
-    padding: 1rem;
     gap: 1rem;
 }
 .table{
@@ -32,8 +31,15 @@
     color: rgb(218, 44, 44);
 }
 .des{
-    margin-top: 2rem;
-    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+   gap: 0.2rem;
+   padding: 1rem;
+
+   background-color: rgb(224, 127, 127);
+    color:white;
+    max-width: 100%;
+    width: 100%;
 }
 
 

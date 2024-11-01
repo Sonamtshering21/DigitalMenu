@@ -55,3 +55,13 @@
   text-align: center;
   margin-top: 10rem;
  }
+
+
+.details{
+  border: 0.1rem solid green;
+  max-width: 50rem;
+  padding: 2rem 4rem;
+  gap: 2rem;
+  border-radius: 0.5rem;
+}
+ 

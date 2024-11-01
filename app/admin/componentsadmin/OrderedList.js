@@ -82,8 +82,8 @@ const OrderedListPage = () => {
         }
     };
 
-    const today = new Date();
-    const formattedDate = `${today.getMonth() + 1}/${today.getDate()}/${today.getFullYear()}`; // Format: MM/DD/YYYY
+    
+     // Format: MM/DD/YYYY
 
     return (
         <div>
@@ -98,7 +98,7 @@ const OrderedListPage = () => {
                     />
                     </div>
                     <div>
-                    <p>Order's Date:</p>
+                    <p>Order Date:</p>
                     <input
                         type="date"
                         value={selectedDate}

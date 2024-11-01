@@ -18,7 +18,7 @@ export async function GET(req, { params }) {
     const client = await pool.connect();
     try {
         const result = await client.query(
-            `SELECT order_status, order_progress 
+            `SELECT order_status, order_progress, selected_items 
              FROM orders 
              WHERE token = $1`,
             [tokenId]
@@ -36,7 +36,7 @@ export async function GET(req, { params }) {
 
         const order = result.rows[0];
         return NextResponse.json(
-            { order_status: order.order_status, order_progress: order.order_progress },
+            { order_status: order.order_status, order_progress: order.order_progress, selected_items: order.selected_items },
             { status: 200 }
         );
     } catch (error) {
@@ -65,11 +65,42 @@ export async function PATCH(req, { params }) {
 
     const client = await pool.connect();
     try {
-        // Build the query to update order status or progress
+        // Initialize variables for updates
         const updates = [];
         const values = [];
         let index = 1;
+        let totalAmount = 0;
 
+        // Check for selected_items to calculate total price if order is confirmed
+        if (order_status === 'Confirmed') {
+            // Fetch selected items to calculate total amount
+            const orderResult = await client.query(
+                `SELECT selected_items FROM orders WHERE token = $1`,
+                [tokenId]
+            );
+
+            if (orderResult.rowCount > 0) {
+                const order = orderResult.rows[0];
+                let selectedItems = [];
+
+                // Parse the selected_items field if it's a string
+                if (typeof order.selected_items === 'string') {
+                    selectedItems = JSON.parse(order.selected_items);
+                } else {
+                    selectedItems = order.selected_items; // Already an object
+                }
+
+                // Calculate the total price
+                totalAmount = selectedItems.reduce((total, item) => {
+                    return total + (item.price * item.quantity);
+                }, 0);
+                
+                // Log the total amount calculated for debugging
+                console.log('Total amount calculated:', totalAmount);
+            }
+        }
+
+        // Build the query to update order status, progress, and total amount
         if (order_status) {
             updates.push(`order_status = $${index++}`);
             values.push(order_status);
@@ -77,6 +108,14 @@ export async function PATCH(req, { params }) {
         if (order_progress) {
             updates.push(`order_progress = $${index++}`);
             values.push(order_progress);
+        }
+        // Update the total_amount if it's confirmed
+        if (order_status === 'Confirmed') {
+            updates.push(`total_amount = $${index++}`); // Assuming 'total_amount' is the field name in your database
+            values.push(totalAmount);
+
+            // Log the total amount to be updated in the database
+            console.log('Updating total_amount to:', totalAmount);
         }
 
         // Ensure that at least one field is being updated
@@ -98,4 +137,3 @@ export async function PATCH(req, { params }) {
         client.release();
     }
 }
-

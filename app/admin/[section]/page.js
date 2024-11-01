@@ -1,6 +1,7 @@
 // app/admin/[section]/page.js
 import OrderedList from '../componentsadmin/OrderedList';
 import MenuList from '../componentsadmin/MenuList'
+import PaymentList from '../componentsadmin/PaymentList'
 // import other components as needed
 
 export default function SectionPage({ params }) {
@@ -10,6 +11,8 @@ export default function SectionPage({ params }) {
         switch (section) {
             case 'OrderedList':
                 return <OrderedList />;
+            case 'PaymentList':
+                return <PaymentList />;
             case 'MenuList':
                 return <MenuList />;
             // Add other cases for different sections
