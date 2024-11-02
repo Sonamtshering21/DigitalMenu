@@ -1,11 +1,8 @@
 import { NextResponse } from 'next/server';
 import pool from '../../../../../lib/db'; // Adjust the path as necessary
-
-export async function GET(req, { params }) 
-{
+export async function GET(req, { params }) {
     const { tokenId } = params; // Extract tokenId from params
 
-    // Log the received tokenId for debugging
     console.log('Received tokenId:', tokenId);
 
     if (!tokenId) {
@@ -17,14 +14,17 @@ export async function GET(req, { params })
 
     const client = await pool.connect();
     try {
-        const result = await client.query(
-            `SELECT order_status, order_progress, selected_items 
-             FROM orders 
-             WHERE token = $1`,
-            [tokenId]
-        );
+        // Query to fetch counts based on order_status, order_progress, and payment_status
+        const result = await client.query(`
+            SELECT 
+                COUNT(*) AS total_orders,
+                COUNT(*) FILTER (WHERE order_status = 'Confrimed') AS delivered_orders,
+                COUNT(*) FILTER (WHERE order_status === 'N/A') AS pending_orders,
+                COUNT(*) FILTER (WHERE payment_status ==='Confrimed') AS payments_orders
+            FROM orders
+            WHERE token = $1
+        `, [tokenId]);
 
-        // Log the result of the query for debugging
         console.log('Query result:', result);
 
         if (result.rowCount === 0) {
@@ -34,13 +34,18 @@ export async function GET(req, { params })
             );
         }
 
-        const order = result.rows[0];
+        const counts = result.rows[0];
         return NextResponse.json(
-            { order_status: order.order_status, order_progress: order.order_progress, selected_items: order.selected_items },
+            {
+                totalOrders: counts.total_orders,
+                deliveredOrders: counts.delivered_orders,
+                pendingOrders: counts.pending_orders,
+                paymentsOrders: counts.payments_orders,
+            },
             { status: 200 }
         );
     } catch (error) {
-        console.error('Error fetching order status:', error);
+        console.error('Error fetching order counts:', error);
         return NextResponse.json(
             { message: 'Internal Server Error' },
             { status: 500 }

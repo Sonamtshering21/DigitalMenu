@@ -88,3 +88,13 @@
   color: green; /* Active link color */
   font-weight: bold; /* Optional: Make the active link bold */
 }
+
+.flexContainer {
+  display: flex;               /* Enables flexbox layout */
+  align-items: center;        /* Centers items vertically */
+  gap: 8px;                   /* Adds space between the icon and text */
+}
+
+.icon {
+  /* Additional icon styles can go here if needed */
+}

@@ -130,15 +130,18 @@ const TokenPage = () => {
                     ))}
                 </tbody>
             </table>
+            {order.order_status === 'N/A' && (
+               <p>To add new items, cancel the previous token and make your selection again</p>
+                                )}
 
             {/* Display Total Price */}
             <p>
-                Status: {order.order_status === "N/A" ? 'Pending' : 'Approved'}
+                <strong>Status:</strong> {order.order_status === "N/A" ? 'Pending' : 'Approved'}
             </p>
             {order.order_status === 'Confirmed' ? (
                 <p>Progress: {order.order_progress === "N/A" ? 'Preparing' : 'Ready to Eat'}</p>
             ) : null}
-            <p>Once Approved you cannot delete</p>
+            <p>Once Approved you cannot cancel order</p>
             <p className={styles.totalPrice}><strong>Total Price:</strong> ${totalPrice.toFixed(2)}</p>
 
             {/* Table for Order Details */}
@@ -151,10 +154,11 @@ const TokenPage = () => {
                     </tr>
                     <tr>
                         <td><strong>Payment:</strong></td>
-                        <td>Not Done</td>
+                        <td>{order.payment_status=='N/A' ? 'Not Done' : "Done"}</td>
                     </tr>
                 </tbody>
             </table>
+            <p>{order.payment_status=='Confirmed' ? 'Thank you for dining at our restaurant! We hope you enjoyed your meal and look forward to welcoming you back soon!' : null}</p>
 
             <button onClick={() => router.back()} className={styles.btn}>Go Back</button>
         </div>

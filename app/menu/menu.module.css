@@ -9,9 +9,10 @@
     width: 100%;
     gap: 1rem;
 }
-.table{
+.table {
     max-width: 85rem;
     border-collapse: collapse;
+    
 }
 .table th{
     padding: 0.5rem;

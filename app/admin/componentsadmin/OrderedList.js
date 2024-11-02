@@ -4,24 +4,46 @@ import { useSession } from 'next-auth/react';
 import style from './adminstyle/OrderedList.module.css';
 
 const OrderedListPage = () => {
-    const { data: session, status } = useSession(); // Get the current session
-    const [orders, setOrders] = useState([]); // State to store all orders
-    const [filteredOrders, setFilteredOrders] = useState([]); // State to store filtered orders based on search
-    const [orderCounts, setOrderCounts] = useState({ totalOrders: 0, deliveredOrders: 0, pendingOrders: 0 }); // State to store counts
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // State to store selected date
-    const [searchToken, setSearchToken] = useState(''); // State for search input
-    const userId = session?.user?.id; // Get user ID from the session
+    const { data: session, status } = useSession();
+    const [orders, setOrders] = useState([]);
+    const [filteredOrders, setFilteredOrders] = useState([]);
+    const [orderCounts, setOrderCounts] = useState({
+        totalOrders: 0,
+        deliveredOrders: 0,
+        pendingOrders: 0,
+        paymentsOrders: 0,
+        confirmedPayments: 0 // New field for confirmed payments
+    });
+    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [searchToken, setSearchToken] = useState('');
+    const userId = session?.user?.id;
 
     useEffect(() => {
         const fetchOrders = async () => {
-            if (!userId) return; // Exit if userId is not available
+            if (!userId) return;
             try {
-                const response = await fetch(`/api/orders/${userId}?date=${selectedDate}`); // Fetch orders for the user based on the selected date
+                const response = await fetch(`/api/orders/${userId}?date=${selectedDate}`);
                 if (response.ok) {
                     const data = await response.json();
-                    setOrders(data.orders); // Update orders state
-                    setOrderCounts(data.counts); // Update order counts state
-                    setFilteredOrders(data.orders); // Initialize filtered orders
+                    
+                    console.log('Fetched orders:', data.orders);
+    
+                    setOrders(data.orders);
+    
+                    // Calculate counts with debug logs
+                    const confirmedPaymentsCount = data.orders.filter(
+                        order => order.payment_status === 'Confirmed'
+                    ).length;
+    
+                    setOrderCounts({
+                        totalOrders: data.orders.length,
+                        deliveredOrders: data.orders.filter(order => order.status = 'Confrimed').length,
+                        pendingOrders: data.orders.filter(order => order.status === 'N/A').length,
+                        paymentsOrders: data.orders.filter(order => order.payment_status !== 'N/A').length,
+                        confirmedPayments: confirmedPaymentsCount
+                    });
+    
+                    setFilteredOrders(data.orders);
                 } else {
                     console.error('Failed to fetch orders');
                 }
@@ -29,32 +51,26 @@ const OrderedListPage = () => {
                 console.error('Error fetching orders:', error);
             }
         };
-
-        fetchOrders(); // Call the function to fetch orders
-    }, [userId, selectedDate]); // Re-run effect if userId or selectedDate changes
-
-
     
+        fetchOrders();
+    }, [userId, selectedDate]);
 
     useEffect(() => {
-        // Filter orders based on search input
         if (searchToken) {
             const lowercasedToken = searchToken.toLowerCase();
             const filtered = orders.filter(order => 
                 order.token.toString().toLowerCase().includes(lowercasedToken)
             );
-            setFilteredOrders(filtered); // Update filtered orders state
+            setFilteredOrders(filtered);
         } else {
-            setFilteredOrders(orders); // Reset to all orders if search input is empty
+            setFilteredOrders(orders);
         }
-    }, [searchToken, orders]); // Re-run effect if searchToken or orders change
+    }, [searchToken, orders]);
 
-    // Loading state
     if (status === "loading") {
         return <p>Loading...</p>;
     }
 
-    // Function to update order status or progress based on token
     const updateOrderField = async (tokenId, field, value) => {
         try {
             const response = await fetch(`/api/orders/token/${tokenId}`, {
@@ -84,9 +100,8 @@ const OrderedListPage = () => {
             console.error(`Error updating order ${field}:`, error);
         }
     };
+
     
-    
-     // Format: MM/DD/YYYY
 
     return (
         <div>
@@ -96,16 +111,16 @@ const OrderedListPage = () => {
                     <input
                         type="text"
                         value={searchToken}
-                        onChange={(e) => setSearchToken(e.target.value)} // Update search input
+                        onChange={(e) => setSearchToken(e.target.value)}
                         placeholder="Enter Token Id"
                     />
-                    </div>
-                    <div>
+                </div>
+                <div>
                     <p>Order Date:</p>
                     <input
                         type="date"
                         value={selectedDate}
-                        onChange={(e) => setSelectedDate(e.target.value)} // Update selected date
+                        onChange={(e) => setSelectedDate(e.target.value)}
                     />
                 </div>
                 <div className={style.statusdetails}>

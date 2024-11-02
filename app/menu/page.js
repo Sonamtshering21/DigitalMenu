@@ -144,7 +144,7 @@ const MenuPage = () => {
                 </form>
             )}
             {error && <div className={styles.error}>{error}</div>}
-            {showError && <div className={styles.error}>Please enter a valid Table Number or Token ID.</div>}
+            {showError && <div className={styles.error}>Please enter a valid Company Id and Table No.</div>}
             
             <table className={styles.table}>
                 <thead>

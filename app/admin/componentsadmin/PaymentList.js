@@ -4,60 +4,73 @@ import { useSession } from 'next-auth/react';
 import style from './adminstyle/OrderedList.module.css';
 
 const PaymentListPage = () => {
-    const { data: session, status } = useSession(); // Get the current session
-    const [orders, setOrders] = useState([]); // State to store all orders
-    const [filteredOrders, setFilteredOrders] = useState([]); // State to store filtered orders based on search
-    const [orderCounts, setOrderCounts] = useState({ totalOrders: 0, deliveredOrders: 0, pendingOrders: 0}); // State to store counts
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // State to store selected date
-    const [searchToken, setSearchToken] = useState(''); // State for search input
-    const userId = session?.user?.id; // Get user ID from the session
+    const { data: session, status } = useSession();
+    const [orders, setOrders] = useState([]);
+    const [filteredOrders, setFilteredOrders] = useState([]);
+    const [orderCounts, setOrderCounts] = useState({
+        totalOrders: 0,
+        deliveredOrders: 0,
+        pendingOrders: 0,
+        paymentsOrders: 0,
+        confirmedPayments: 0 // New field for confirmed payments
+    });
+    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [searchToken, setSearchToken] = useState('');
+    const userId = session?.user?.id;
 
-    // New state for user inputs
     const [paymentMethodInput, setPaymentMethodInput] = useState({});
     const [transactionIdInput, setTransactionIdInput] = useState({});
 
     useEffect(() => {
-      const fetchOrders = async () => {
-          if (!userId) return; // Exit if userId is not available
-          try {
-              const response = await fetch(`/api/orders/${userId}?date=${selectedDate}`); // Fetch orders for the user based on the selected date
-              if (response.ok) {
-                  const data = await response.json();
-                  setOrders(data.orders); // Update orders state
-                  setOrderCounts(data.counts); // Update order counts state
-                  setFilteredOrders(data.orders); // Initialize filtered orders
-              } else {
-                  console.error('Failed to fetch orders');
-              }
-          } catch (error) {
-              console.error('Error fetching orders:', error);
-          }
-      };
+        const fetchOrders = async () => {
+            if (!userId) return;
+            try {
+                const response = await fetch(`/api/orders/${userId}?date=${selectedDate}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setOrders(data.orders);
 
-      fetchOrders(); // Call the function to fetch orders
-  }, [userId, selectedDate]); // Re-run effect if userId or selectedDate changes
+                    // Count orders based on different criteria
+                    const confirmedPaymentsCount = data.orders.filter(
+                        order => order.payment_status === 'Confirmed'
+                    ).length;
 
+                    setOrderCounts({
+                        totalOrders: data.orders.length,
+                        deliveredOrders: data.orders.filter(order => order.status === 'Delivered').length,
+                        pendingOrders: data.orders.filter(order => order.status === 'N/A').length,
+                        paymentsOrders: data.orders.filter(order => order.payment_status !== 'N/A').length,
+                        confirmedPayments: confirmedPaymentsCount // Set confirmed payments count
+                    });
 
+                    setFilteredOrders(data.orders);
+                } else {
+                    console.error('Failed to fetch orders');
+                }
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+            }
+        };
+
+        fetchOrders();
+    }, [userId, selectedDate]);
 
     useEffect(() => {
-        // Filter orders based on search input
         if (searchToken) {
             const lowercasedToken = searchToken.toLowerCase();
             const filtered = orders.filter(order => 
                 order.token.toString().toLowerCase().includes(lowercasedToken)
             );
-            setFilteredOrders(filtered); // Update filtered orders state
+            setFilteredOrders(filtered);
         } else {
-            setFilteredOrders(orders); // Reset to all orders if search input is empty
+            setFilteredOrders(orders);
         }
-    }, [searchToken, orders]); // Re-run effect if searchToken or orders change
+    }, [searchToken, orders]);
 
-    // Loading state
     if (status === "loading") {
         return <p>Loading...</p>;
     }
 
-    // Function to update order status or progress based on token
     const updateOrderField = async (tokenId, field, value) => {
         try {
             const response = await fetch(`/api/orders/token/${tokenId}`, {
@@ -69,7 +82,6 @@ const PaymentListPage = () => {
             });
 
             if (response.ok) {
-                // Update the local state to reflect the change
                 setFilteredOrders((prevOrders) =>
                     prevOrders.map((order) =>
                         order.token === tokenId ? { ...order, [field]: value } : order
@@ -88,25 +100,22 @@ const PaymentListPage = () => {
         }
     };
 
-    // Function to handle payment method submission
     const handlePaymentMethodSubmit = (token) => {
         const value = paymentMethodInput[token];
         if (value) {
             updateOrderField(token, 'payment_method', value);
-            setPaymentMethodInput(prev => ({ ...prev, [token]: '' })); // Clear the input after submission
+            setPaymentMethodInput(prev => ({ ...prev, [token]: '' }));
         }
     };
 
-    // Function to handle transaction ID submission
     const handleTransactionIdSubmit = (token) => {
         const value = transactionIdInput[token];
         if (value) {
             updateOrderField(token, 'transaction_id', value);
-            setTransactionIdInput(prev => ({ ...prev, [token]: '' })); // Clear the input after submission
+            setTransactionIdInput(prev => ({ ...prev, [token]: '' }));
         }
     };
 
-    // Function to handle key down events
     const handleKeyDown = (e, token, field) => {
         if (e.key === 'Enter') {
             if (field === 'paymentMethod') {
@@ -125,7 +134,7 @@ const PaymentListPage = () => {
                     <input
                         type="text"
                         value={searchToken}
-                        onChange={(e) => setSearchToken(e.target.value)} // Update search input
+                        onChange={(e) => setSearchToken(e.target.value)}
                         placeholder="Enter Token Id"
                     />
                 </div>
@@ -134,17 +143,15 @@ const PaymentListPage = () => {
                     <input
                         type="date"
                         value={selectedDate}
-                        onChange={(e) => setSelectedDate(e.target.value)} // Update selected date
+                        onChange={(e) => setSelectedDate(e.target.value)}
                     />
                 </div>
                 <div className={style.statusdetails}>
                     <p>Total Orders: <span>{orderCounts.totalOrders}</span></p>
-                    <p>Delivered Orders: <span>{orderCounts.deliveredOrders}</span></p>
-                    <p>Pending Orders: <span>{orderCounts.pendingOrders}</span></p>
-                    <p>Pending Orders: <span>{orderCounts.paymentsOrders}</span></p>
+                    <p>Confirmed Payments: <span>{orderCounts.confirmedPayments}</span></p>
+                    <p>Pending Payments: <span>{orderCounts.totalOrders-orderCounts.confirmedPayments}</span></p>
                 </div>
             </div>
-
             {filteredOrders.length > 0 ? (
                 <table>
                     <thead>
