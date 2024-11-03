@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 import QRCode from 'qrcode';
 
 const QRCodeGenerator = ({ numberOfTables, generate, setGenerate }) => {
@@ -53,7 +54,7 @@ const QRCodeGenerator = ({ numberOfTables, generate, setGenerate }) => {
         {qrCodes.length > 0 ? (
           qrCodes.map((qrCode, index) => (
             <div key={index}>
-              <img src={qrCode} alt={`QR Code for table ${index + 1}`} />
+              <Image src={qrCode} alt={`QR Code for table ${index + 1}`} />
               <a href={qrCode} download={`QR_Code_Table_${index + 1}.png`}>
                 Download QR Code for Table {index + 1}
               </a>

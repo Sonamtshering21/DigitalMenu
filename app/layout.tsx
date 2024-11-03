@@ -1,12 +1,12 @@
-
 import type { Metadata } from "next";
-
 import { AuthProvider } from './Providers'; // Ensure this is set up properly
 import { SelectedItemsProvider } from './context/SelectedItemsContext';
-
+import { Outfit } from 'next/font/google';
 
 import "./globals.css";
 
+// Use the correct property for weight
+const outfit = Outfit({ subsets: ['latin'], weight: ['100', '400', '700', '900'] });
 
 export const metadata: Metadata = {
   title: "DigitalMenu",
@@ -21,16 +21,11 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
-     
-     <head>
+      <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap"
-          rel="stylesheet"
-        />
       </head>
-    <body className="font-outfit"> {/* Use the Outfit font here */}
+      <body className={outfit.className}> {/* Use the Outfit font here */}
         <SelectedItemsProvider>
           <AuthProvider>
             {children}
