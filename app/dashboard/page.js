@@ -5,12 +5,12 @@ import { useSession } from "next-auth/react";
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation'; // Import useRouter to redirect
 import style from './dashboard.module.css';
-import supabase from '../../lib/subabaseclient'
+
 
 export default function DashboardLanding() {
   const { data: session } = useSession();
   const router = useRouter();
-  console.log(supabase)
+
 
   useEffect(() => {
     // If there's a session and the user ID exists, redirect to the user's specific dashboard
