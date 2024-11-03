@@ -8,6 +8,13 @@ interface CustomToken extends JWT {
   id: string; // Extend the JWT type to include user ID
 }
 
+// Define a custom User type for your application
+interface CustomUser {
+  id: string;
+  email: string;
+  name: string; // Include name property
+}
+
 export const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
@@ -16,7 +23,7 @@ export const authOptions: AuthOptions = {
         email: { label: "Email", type: "text", placeholder: "your.email@example.com" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials): Promise<CustomUser | null> {
         if (!credentials) {
           throw new Error("No credentials provided");
         }
@@ -24,34 +31,42 @@ export const authOptions: AuthOptions = {
         const { email, password } = credentials;
 
         try {
-          // Fetch user by email from Supabase
+          console.time("Fetch User");
           const { data: user, error: userError } = await supabase
             .from("users")
-            .select("*")
+            .select("id, email, password, name") // Ensure to include the name field
             .eq("email", email)
             .single();
+          console.timeEnd("Fetch User");
 
           if (userError) {
             console.error("Error fetching user:", userError);
-            return null; // Return null if no user is found or an error occurs
+            return null;
           }
 
           if (!user) {
             return null; // No user found
           }
 
-          // Compare provided password with stored hashed password
+          console.time("Password Compare");
           const passwordsMatch = await bcrypt.compare(password, user.password);
+          console.timeEnd("Password Compare");
+
           if (!passwordsMatch) {
             return null; // Passwords do not match
           }
 
-          return user; // Return the authenticated user
+          // Return a full user object that includes the required fields
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name || '', // Use empty string if name is not available
+          }; 
         } catch (error) {
           console.error("Error during authorization:", error);
           throw new Error("Authorization failed");
         }
-      },
+      }
     }),
   ],
   callbacks: {
