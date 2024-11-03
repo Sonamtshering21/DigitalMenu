@@ -1,17 +1,12 @@
-
-
 import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";    
-import { AuthOptions } from "next-auth"; 
-import { JWT } from "next-auth/jwt"; 
-import supabase from '../lib/subabaseclient'
+import bcrypt from "bcryptjs";
+import { AuthOptions } from "next-auth";
+import { JWT } from "next-auth/jwt";
+import supabase from "../lib/subabaseclient"; // Supabase client should be initialized in this module
 
 interface CustomToken extends JWT {
-  id: string; 
+  id: string; // Extend the JWT type to include user ID
 }
-
-// Initialize Supabase client
-
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -31,27 +26,27 @@ export const authOptions: AuthOptions = {
         try {
           // Fetch user by email from Supabase
           const { data: user, error: userError } = await supabase
-            .from('users')
-            .select('*')
-            .eq('email', email)
+            .from("users")
+            .select("*")
+            .eq("email", email)
             .single();
 
           if (userError) {
             console.error("Error fetching user:", userError);
-            return null; // User not found
+            return null; // Return null if no user is found or an error occurs
           }
 
           if (!user) {
-            return null; // User not found
+            return null; // No user found
           }
 
-          // Compare the provided password with the stored hashed password
+          // Compare provided password with stored hashed password
           const passwordsMatch = await bcrypt.compare(password, user.password);
           if (!passwordsMatch) {
             return null; // Passwords do not match
           }
 
-          return user; // Successful authorization
+          return user; // Return the authenticated user
         } catch (error) {
           console.error("Error during authorization:", error);
           throw new Error("Authorization failed");
@@ -62,17 +57,17 @@ export const authOptions: AuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id; 
+        token.id = user.id; // Assign user id to token
       }
       return token;
     },
     async session({ session, token }) {
-      const customToken = token as CustomToken; 
+      const customToken = token as CustomToken;
 
       if (session.user) {
-        session.user.id = customToken.id; 
+        session.user.id = customToken.id; // Assign user ID to session
       } else {
-        session.user = { id: customToken.id }; 
+        session.user = { id: customToken.id }; // Initialize session.user with ID if undefined
       }
       return session;
     },
@@ -84,6 +79,6 @@ export const authOptions: AuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
-    signIn: "/",
+    signIn: "/", // Redirect to home or another sign-in page
   },
 };

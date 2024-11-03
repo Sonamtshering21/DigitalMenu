@@ -31,8 +31,8 @@ const OrderedListPage = () => {
 
                     setOrderCounts({
                         totalOrders: data.orders.length,
-                        deliveredOrders: data.orders.filter(order => order.status === 'Confirmed').length,
-                        pendingOrders: data.orders.filter(order => order.status === 'N/A').length,
+                        deliveredOrders: data.orders.filter(order => order.order_status === 'Confirmed').length,
+                        pendingOrders: data.orders.filter(order => order.order_progress !== 'N/A').length,
                         paymentsOrders: data.orders.filter(order => order.payment_status !== 'N/A').length,
                         confirmedPayments: data.orders.filter(order => order.payment_status === 'Confirmed').length
                     });
@@ -112,8 +112,8 @@ const OrderedListPage = () => {
                 </div>
                 <div className={style.statusdetails}>
                     <p>Total Orders: <span>{orderCounts.totalOrders}</span></p>
-                    <p>Delivered Orders: <span>{orderCounts.deliveredOrders}</span></p>
-                    <p>Pending Orders: <span>{orderCounts.pendingOrders}</span></p>
+                    <p>Delivered Orders: <span>{orderCounts.pendingOrders}</span></p>
+                    <p>Pending Orders: <span>{Number(orderCounts.totalOrders) - Number(orderCounts.pendingOrders)}</span></p>
                 </div>
             </div>
 
@@ -142,7 +142,7 @@ const OrderedListPage = () => {
                                         {order.selected_items.map(item => (
                                             <li key={item.id}>
                                                 <Image
-    src={item.image_url || '/noimage.jpg'} // Provide a fallback image if the URL is invalid
+    src={item.image_url || '/noimage.jpgs'} // Provide a fallback image if the URL is invalid
     alt={item.dish_name}
     width={50}
     height={50}

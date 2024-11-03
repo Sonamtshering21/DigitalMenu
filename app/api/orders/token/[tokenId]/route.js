@@ -21,7 +21,7 @@ export async function GET(req, { params }) {
             .select(`
                 COUNT(*) AS total_orders,
                 COUNT(*) FILTER (WHERE order_status = 'Confirmed') AS delivered_orders,
-                COUNT(*) FILTER (WHERE order_status ='N/A') AS pending_orders,
+                COUNT(*) FILTER (WHERE order_progress ='N/A') AS pending_orders,
                 COUNT(*) FILTER (WHERE payment_status = 'Confirmed') AS payments_orders
             `)
             .eq('token', tokenId);
