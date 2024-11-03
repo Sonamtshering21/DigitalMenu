@@ -142,12 +142,12 @@ const OrderedListPage = () => {
                                         {order.selected_items.map(item => (
                                             <li key={item.id}>
                                                 <Image
-    src={item.image_url || '/noimage.jpgs'} // Provide a fallback image if the URL is invalid
-    alt={item.dish_name}
-    width={50}
-    height={50}
-    style={{ marginRight: '10px' }}
-/>
+                                                    src={item.image_url || '/noimage.jpg'} // Provide a fallback image if the URL is invalid
+                                                    alt={item.dish_name}
+                                                    width={50}
+                                                    height={50}
+                                                    style={{ marginRight: '10px' }}
+                                                />
                                                 <strong>{item.dish_name}</strong> - 
                                                 {item.quantity} x ${item.price}
                                             </li>
