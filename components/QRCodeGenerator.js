@@ -17,7 +17,7 @@ const QRCodeGenerator = ({ numberOfTables, generate, setGenerate }) => {
 
       for (let i = 1; i <= numberOfTables; i++) {
         try {
-          const url = `http://localhost:3000/menu?user_id=${userId}&table=${i}`;
+          const url = `https://bhutandigialmenusystem.netlify.app/menu?user_id=${userId}&table=${i}`;
           const canvas = document.createElement('canvas');
 
           await QRCode.toCanvas(canvas, url, {
