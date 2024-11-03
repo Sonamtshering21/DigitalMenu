@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import style from './adminstyle/OrderedList.module.css';
+import Image from 'next/image';
 
 const PaymentListPage = () => {
     const { data: session, status } = useSession();
@@ -178,10 +179,12 @@ const PaymentListPage = () => {
                                     <ul>
                                         {order.selected_items.map(item => (
                                             <li key={item.id}>
-                                                <img
+                                                <Image
                                                     src={item.image_url}
                                                     alt={item.dish_name}
-                                                    style={{ width: '50px', height: '50px', marginRight: '10px' }}
+                                                    width={50}    // Numeric value for width
+                                                    height={50}   // Numeric value for height
+                                                    style={{ marginRight: '10px' }} // Optional margin styling
                                                 />
                                                 <strong>{item.dish_name}</strong> - 
                                                 {item.quantity} x ${item.price}
