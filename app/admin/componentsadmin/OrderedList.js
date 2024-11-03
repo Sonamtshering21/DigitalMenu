@@ -1,5 +1,6 @@
-'use client';
+"use client"
 import React, { useEffect, useState } from 'react';
+
 import { useSession } from 'next-auth/react';
 import style from './adminstyle/OrderedList.module.css';
 import Image from 'next/image';
@@ -13,7 +14,7 @@ const OrderedListPage = () => {
         deliveredOrders: 0,
         pendingOrders: 0,
         paymentsOrders: 0,
-        confirmedPayments: 0 // New field for confirmed payments
+        confirmedPayments: 0
     });
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [searchToken, setSearchToken] = useState('');
@@ -26,24 +27,16 @@ const OrderedListPage = () => {
                 const response = await fetch(`/api/orders/${userId}?date=${selectedDate}`);
                 if (response.ok) {
                     const data = await response.json();
-                    
-                    console.log('Fetched orders:', data.orders);
-    
                     setOrders(data.orders);
-    
-                    // Calculate counts with debug logs
-                    const confirmedPaymentsCount = data.orders.filter(
-                        order => order.payment_status === 'Confirmed'
-                    ).length;
-    
+
                     setOrderCounts({
                         totalOrders: data.orders.length,
-                        deliveredOrders: data.orders.filter(order => order.status = 'Confrimed').length,
+                        deliveredOrders: data.orders.filter(order => order.status === 'Confirmed').length,
                         pendingOrders: data.orders.filter(order => order.status === 'N/A').length,
                         paymentsOrders: data.orders.filter(order => order.payment_status !== 'N/A').length,
-                        confirmedPayments: confirmedPaymentsCount
+                        confirmedPayments: data.orders.filter(order => order.payment_status === 'Confirmed').length
                     });
-    
+
                     setFilteredOrders(data.orders);
                 } else {
                     console.error('Failed to fetch orders');
@@ -52,25 +45,17 @@ const OrderedListPage = () => {
                 console.error('Error fetching orders:', error);
             }
         };
-    
+
         fetchOrders();
     }, [userId, selectedDate]);
 
     useEffect(() => {
-        if (searchToken) {
-            const lowercasedToken = searchToken.toLowerCase();
-            const filtered = orders.filter(order => 
-                order.token.toString().toLowerCase().includes(lowercasedToken)
-            );
-            setFilteredOrders(filtered);
-        } else {
-            setFilteredOrders(orders);
-        }
+        const lowercasedToken = searchToken.toLowerCase();
+        const filtered = orders.filter(order => 
+            order.token.toString().toLowerCase().includes(lowercasedToken)
+        );
+        setFilteredOrders(searchToken ? filtered : orders);
     }, [searchToken, orders]);
-
-    if (status === "loading") {
-        return <p>Loading...</p>;
-    }
 
     const updateOrderField = async (tokenId, field, value) => {
         try {
@@ -81,16 +66,15 @@ const OrderedListPage = () => {
                 },
                 body: JSON.stringify({ [field]: value, source: 'orderedList' }),
             });
-    
+
             if (response.ok) {
-                // Update the local state to reflect the change
-                setFilteredOrders((prevOrders) =>
-                    prevOrders.map((order) =>
+                setFilteredOrders(prevOrders =>
+                    prevOrders.map(order => 
                         order.token === tokenId ? { ...order, [field]: value } : order
                     )
                 );
-                setOrders((prevOrders) =>
-                    prevOrders.map((order) =>
+                setOrders(prevOrders =>
+                    prevOrders.map(order => 
                         order.token === tokenId ? { ...order, [field]: value } : order
                     )
                 );
@@ -102,7 +86,9 @@ const OrderedListPage = () => {
         }
     };
 
-    
+    if (status === "loading") {
+        return <p>Loading...</p>; // Consider adding a spinner or skeleton here
+    }
 
     return (
         <div>
@@ -156,12 +142,12 @@ const OrderedListPage = () => {
                                         {order.selected_items.map(item => (
                                             <li key={item.id}>
                                                 <Image
-                                                    src={item.image_url}
-                                                    alt={item.dish_name}
-                                                    width={50}   // Set width here
-                                                    height={50}  // Set height here
-                                                    style={{ marginRight: '10px' }} // Optional margin styling
-                                                />
+    src={item.image_url || '/fallback-image.png'} // Provide a fallback image if the URL is invalid
+    alt={item.dish_name}
+    width={50}
+    height={50}
+    style={{ marginRight: '10px' }}
+/>
                                                 <strong>{item.dish_name}</strong> - 
                                                 {item.quantity} x ${item.price}
                                             </li>
@@ -169,30 +155,22 @@ const OrderedListPage = () => {
                                     </ul>
                                 </td>
                                 <td>
-                                    {/* Make status clickable */}
-                                    {order.order_status === 'N/A' ? (
-                                        <span
-                                            onClick={() => updateOrderField(order.token, 'order_status', 'Confirmed')}
-                                            style={{ color: 'blue', cursor: 'pointer' }}
-                                        >
-                                            N/A
-                                        </span>
-                                    ) : (
-                                        order.order_status
-                                    )}
+                                    <button
+                                        onClick={() => order.order_status === 'N/A' && updateOrderField(order.token, 'order_status', 'Confirmed')}
+                                        style={{ color: order.order_status === 'N/A' ? 'blue' : 'black' }}
+                                        aria-label={`Change status of order ${order.token}`}
+                                    >
+                                        {order.order_status === 'N/A' ? 'N/A' : order.order_status}
+                                    </button>
                                 </td>
                                 <td>
-                                    {/* Make progress clickable */}
-                                    {order.order_progress === 'N/A' ? (
-                                        <span
-                                            onClick={() => updateOrderField(order.token, 'order_progress', 'Ready to Eat')}
-                                            style={{ color: 'blue', cursor: 'pointer' }}
-                                        >
-                                            N/A
-                                        </span>
-                                    ) : (
-                                        order.order_progress
-                                    )}
+                                    <button
+                                        onClick={() => order.order_progress === 'N/A' && updateOrderField(order.token, 'order_progress', 'Ready to Eat')}
+                                        style={{ color: order.order_progress === 'N/A' ? 'blue' : 'black' }}
+                                        aria-label={`Change progress of order ${order.token}`}
+                                    >
+                                        {order.order_progress === 'N/A' ? 'N/A' : order.order_progress}
+                                    </button>
                                 </td>
                             </tr>
                         ))}

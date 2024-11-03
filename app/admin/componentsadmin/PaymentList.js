@@ -179,12 +179,12 @@ const PaymentListPage = () => {
                                     <ul>
                                         {order.selected_items.map(item => (
                                             <li key={item.id}>
-                                                <Image
-                                                    src={item.image_url}
+                                               <Image
+                                                    src={item.image_url || '/fallback-image.png'} // Provide a fallback image if the URL is invalid
                                                     alt={item.dish_name}
-                                                    width={50}    // Numeric value for width
-                                                    height={50}   // Numeric value for height
-                                                    style={{ marginRight: '10px' }} // Optional margin styling
+                                                    width={50}
+                                                    height={50}
+                                                    style={{ marginRight: '10px' }}
                                                 />
                                                 <strong>{item.dish_name}</strong> - 
                                                 {item.quantity} x ${item.price}
