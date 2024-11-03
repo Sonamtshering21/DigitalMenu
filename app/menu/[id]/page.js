@@ -5,12 +5,15 @@ import { useRouter } from 'next/navigation';
 // Import your styles
 import styles from '../menu.module.css';
 import Image from 'next/image';
+import subabase from '../../../lib/subabaseclient'
 
 const MenuItemPage = () => {
   const router = useRouter();
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true); // State to track loading
   const id = router.query?.id; // Use optional chaining to access id safely
+  console.log(subabase);
+  
 
   useEffect(() => {
     if (id) {

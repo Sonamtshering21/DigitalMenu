@@ -5,42 +5,45 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import QRCode from 'qrcode';
 
-const QRCodeGenerator = () => {
+const QRCodeGenerator = ({ numberOfTables, generate, setGenerate }) => {
   const { data: session } = useSession();
   const userId = session?.user?.id; // Get user ID from session
   const [qrCodes, setQrCodes] = useState([]);
-  const tableNumbers = [1, 2, 3, 5, 6, 7, 8, 9]; // Example table numbers
 
   useEffect(() => {
-    const generateQRCode = async (userId, tableNumber) => {
-      try {
-        const url = `http://localhost:3000/menu?C=${userId}&table=${tableNumber}`;
-        const canvas = document.createElement('canvas');
+    const generateQRCode = async () => {
+      const newQrCodes = []; // Temporary array to store new QR codes
 
-        await QRCode.toCanvas(canvas, url, {
-          width: 200,
-          margin: 2,
-        });
+      for (let i = 1; i <= numberOfTables; i++) {
+        try {
+          const url = `http://localhost:3000/menu?user_id=${userId}&table=${i}`;
+          const canvas = document.createElement('canvas');
 
-        const dataUrl = canvas.toDataURL(); // Convert the canvas to a data URL
-        setQrCodes((prevCodes) => [...prevCodes, dataUrl]);
-      } catch (err) {
-        console.error(err);
+          await QRCode.toCanvas(canvas, url, {
+            width: 200,
+            margin: 2,
+          });
+
+          const dataUrl = canvas.toDataURL(); // Convert the canvas to a data URL
+          newQrCodes.push(dataUrl); // Add the generated QR code to the array
+        } catch (err) {
+          console.error(`Error generating QR code for table ${i}:`, err);
+        }
       }
+
+      setQrCodes(newQrCodes); // Update the state with all new QR codes at once
+      setGenerate(false); // Reset generate flag to prevent re-generation
     };
 
-    if (userId) {
-      tableNumbers.forEach((tableNumber) => {
-        generateQRCode(userId, tableNumber);
-      });
-    } else {
-      console.error('User ID is not available. Cannot generate QR codes.');
+    // Generate QR codes only if generate is true, userId and numberOfTables are valid
+    if (generate && userId && numberOfTables > 0) {
+      setQrCodes([]); // Clear any existing QR codes before generating new ones
+      generateQRCode(); // Call the function to generate QR codes
     }
-  }, [userId]);
+  }, [generate, userId, numberOfTables, setGenerate]); // Dependency array includes generate flag
 
   return (
     <div>
-      <h2>QR Code Generation</h2>
       {userId ? (
         <p>Welcome, user {userId}. QR codes are being generated.</p>
       ) : (
@@ -50,9 +53,9 @@ const QRCodeGenerator = () => {
         {qrCodes.length > 0 ? (
           qrCodes.map((qrCode, index) => (
             <div key={index}>
-              <img src={qrCode} alt={`QR Code for table ${tableNumbers[index]}`} />
-              <a href={qrCode} download={`QR_Code_Table_${tableNumbers[index]}.png`}>
-                Download QR Code
+              <img src={qrCode} alt={`QR Code for table ${index + 1}`} />
+              <a href={qrCode} download={`QR_Code_Table_${index + 1}.png`}>
+                Download QR Code for Table {index + 1}
               </a>
             </div>
           ))

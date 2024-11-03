@@ -6,12 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "export": "next export",
     "lint": "next lint"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.46.1",
     "@types/bcryptjs": "^2.4.6",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
+    "firebase": "^11.0.1",
     "next": "14.2.16",
     "next-auth": "^4.24.10",
     "pg": "^8.13.0",

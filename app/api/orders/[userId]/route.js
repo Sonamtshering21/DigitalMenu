@@ -1,48 +1,84 @@
-import pool from '../../../../lib/db'; // Adjust the import path as necessary
+import supabase from '../../../../lib/subabaseclient';
 import { NextResponse } from 'next/server';
 
 export async function GET(req, { params }) {
-    const { userId } = params; // Extract userId from the URL parameters
+    const { userId } = params;
 
     const url = new URL(req.url);
-    const dateParam = url.searchParams.get('date') || new Date().toISOString().split('T')[0]; // Use selected date or default to today
+    const dateParam = url.searchParams.get('date') || new Date().toISOString().split('T')[0];
+
+    const startDate = new Date(dateParam);
+    startDate.setHours(0, 0, 0, 0);
+
+    const endDate = new Date(dateParam);
+    endDate.setHours(23, 59, 59, 999);
 
     try {
-        const client = await pool.connect();
+        // Fetch the orders for the given user and date range
+        const { data: orders, error: ordersError } = await supabase
+            .from('orders')
+            .select('*')
+            .eq('user_id', userId)
+            .gte('created_at', startDate.toISOString())
+            .lte('created_at', endDate.toISOString());
 
-        // Query to get all orders for the user created on the selected date
-        const ordersResult = await client.query(
-            'SELECT * FROM orders WHERE user_id = $1 AND created_at::date = $2',
-            [userId, dateParam]
-        );
+        if (ordersError) {
+            console.error('Error fetching orders:', ordersError);
+            return NextResponse.json({ message: 'Error fetching orders.' }, { status: 500 });
+        }
 
-        // Query to get total, pending, and delivered order counts for orders created on the selected date
-        const countsResult = await client.query(
-            `SELECT
-                COUNT(*) AS total_orders,
-                COUNT(CASE WHEN order_progress = 'N/A' THEN 1 END) AS pending_orders,
-                COUNT(CASE WHEN order_progress = 'Ready to Eat' THEN 1 END) AS delivered_orders
-             FROM orders
-             WHERE user_id = $1 AND created_at::date = $2`,
-            [userId, dateParam]
-        );
+        // Fetch total order count
+        const { count: totalOrdersCount, error: totalCountError } = await supabase
+            .from('orders')
+            .select('*', { count: 'exact' })
+            .eq('user_id', userId)
+            .gte('created_at', startDate.toISOString())
+            .lte('created_at', endDate.toISOString());
 
-        client.release();
+        if (totalCountError) {
+            console.error('Error fetching total orders count:', totalCountError);
+            return NextResponse.json({ message: 'Error fetching total orders count.' }, { status: 500 });
+        }
 
-        // Extract counts from the counts result
-        const { total_orders, pending_orders, delivered_orders } = countsResult.rows[0];
+        // Fetch pending order count
+        const { count: pendingOrdersCount, error: pendingCountError } = await supabase
+            .from('orders')
+            .select('*', { count: 'exact' })
+            .eq('user_id', userId)
+            .gte('created_at', startDate.toISOString())
+            .lte('created_at', endDate.toISOString())
+            .eq('order_progress', 'N/A');
+
+        if (pendingCountError) {
+            console.error('Error fetching pending orders count:', pendingCountError);
+            return NextResponse.json({ message: 'Error fetching pending orders count.' }, { status: 500 });
+        }
+
+        // Fetch delivered order count
+        const { count: deliveredOrdersCount, error: deliveredCountError } = await supabase
+            .from('orders')
+            .select('*', { count: 'exact' })
+            .eq('user_id', userId)
+            .gte('created_at', startDate.toISOString())
+            .lte('created_at', endDate.toISOString())
+            .eq('order_progress', 'Ready to Eat');
+
+        if (deliveredCountError) {
+            console.error('Error fetching delivered orders count:', deliveredCountError);
+            return NextResponse.json({ message: 'Error fetching delivered orders count.' }, { status: 500 });
+        }
 
         // Return both order details and counts in the response
         return NextResponse.json({
-            orders: ordersResult.rows,
+            orders,
             counts: {
-                totalOrders: parseInt(total_orders),
-                pendingOrders: parseInt(pending_orders),
-                deliveredOrders: parseInt(delivered_orders)
-            }
+                totalOrders: totalOrdersCount || 0,
+                pendingOrders: pendingOrdersCount || 0,
+                deliveredOrders: deliveredOrdersCount || 0,
+            },
         });
     } catch (error) {
-        console.error('Error fetching orders:', error);
+        console.error('Unexpected error:', error);
         return NextResponse.error();
     }
 }

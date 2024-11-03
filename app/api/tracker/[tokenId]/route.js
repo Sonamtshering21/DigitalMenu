@@ -1,4 +1,4 @@
-import pool from '../../../../lib/db'; // Adjust the import path as necessary
+import supabase from '../../../../lib/subabaseclient'; 
 import { NextResponse } from 'next/server';
 
 export async function GET(req, { params }) {
@@ -8,17 +8,25 @@ export async function GET(req, { params }) {
     console.log('Extracted tokenId:', tokenId);
 
     try {
-        const client = await pool.connect(); // Get a client from the pool
-        const result = await client.query('SELECT * FROM orders WHERE token = $1', [tokenId]);
-        client.release(); // Release the client back to the pool
+        // Use Supabase to fetch the order with the specified token ID
+        const { data, error } = await supabase
+            .from('orders')
+            .select('*')
+            .eq('token', tokenId)
+            .single(); // Fetch a single order
 
-        if (result.rows.length === 0) {
+        if (error) {
+            console.error('Error fetching order:', error);
+            return NextResponse.json({ message: 'Error fetching order.' }, { status: 500 });
+        }
+
+        if (!data) {
             return NextResponse.json({ message: 'No order found for this token ID.' }, { status: 404 });
         }
 
-        return NextResponse.json({ order: result.rows[0] }); // Respond with the found order
+        return NextResponse.json({ order: data }); // Respond with the found order
     } catch (error) {
-        console.error('Error fetching order:', error);
+        console.error('Unexpected error:', error);
         return NextResponse.error();
     }
 }

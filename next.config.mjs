@@ -1,12 +1,10 @@
-
 // next.config.mjs
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    images: {
+  //output: 'export', // Set output to export for static generation
+  images: {
       domains: ['th.bing.com'], // Allow images from this domain
-    },
-  };
-  
-  // Export the configuration after declaring it
-  export default nextConfig;
-  
+  },
+};
+
+export default nextConfig;

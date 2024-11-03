@@ -1,29 +1,33 @@
-import pool from '../../../lib/db'; // Adjust the import path according to your project structure
-//import { getSession } from 'next-auth/react'; 
+import supabase from '../../../lib/subabaseclient'; 
+import { NextResponse } from 'next/server';
+
 export async function POST(req) {
     try {
         const { token, tableNumber, userId, selectedItems } = await req.json(); // Parse incoming JSON
 
-        const client = await pool.connect(); // Connect to the PostgreSQL client
+        // Insert order using Supabase
+        const { data, error } = await supabase
+            .from('orders')
+            .insert([
+                {
+                    token,
+                    table_number: tableNumber,
+                    user_id: userId,
+                    selected_items: selectedItems,
+                    order_status: 'N/A',
+                    order_progress: 'N/A'
+                }
+            ])
+            .single(); // Use .single() to retrieve the inserted row if it exists
 
-        // Insert order using token, table number, user_id, and store selected items as JSON
-        const result = await client.query(
-            'INSERT INTO orders (token, table_number, user_id, selected_items, order_status, order_progress) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-            [token, tableNumber, userId, JSON.stringify(selectedItems), 'N/A', 'N/A'] // Include userId and default values in the values array
-        );
+        if (error) {
+            console.error('Error inserting order:', error);
+            return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+        }
 
-        client.release(); // Release the client back to the pool
-
-        const newOrder = result.rows[0]; // Get the newly created order
-        return new Response(JSON.stringify({ success: true, order: newOrder }), {
-            status: 201, // Created
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ success: true, order: data }, { status: 201 });
     } catch (error) {
-        console.error('Error saving order:', error);
-        return new Response(JSON.stringify({ success: false, error: 'Error saving order.' }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        console.error('Unexpected error:', error);
+        return NextResponse.json({ success: false, error: 'Unexpected error while saving order.' }, { status: 500 });
     }
 }

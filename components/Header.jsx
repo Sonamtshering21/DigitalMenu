@@ -27,14 +27,14 @@ const Header = () => {
           <>
             <li>
                     <Link href={`/dashboard/${userId}`} className='hover:text-blue-400'>
-                        Dashboard
+                        Company Details
                     </Link>
                 </li>
               <li>
-              <Link href='/admin' className='hover:text-blue-400'>Dash board</Link>
+              <Link href='/admin' className='hover:text-blue-400'>Dashboard</Link>
             </li>
             <li>
-              <Link href='/qr-codes' className='hover:text-blue-400'>qrcode</Link>
+              <Link href='/qr-codes' className='hover:text-blue-400'>QRcode</Link>
             </li>
            
            
