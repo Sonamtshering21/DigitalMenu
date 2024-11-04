@@ -12,20 +12,24 @@ const MenuList = () => {
     dish_name: '',
     description: '',
     price: '',
-    image_url: ''
+    image: null // Change to image file
   });
   const [showForm, setShowForm] = useState(false); // State to control form visibility
   const [isEditingAll, setIsEditingAll] = useState(false); // State to track if all items are being edited
   const [changes, setChanges] = useState({}); // Track changes for each item
+  const [successMessage, setSuccessMessage] = useState(''); // State for success message
+  const [errorMessage, setErrorMessage] = useState(''); // State for error message
 
   useEffect(() => {
     const fetchMenuItems = async () => {
       if (userId) {
         try {
           const response = await fetch(`/api/menu?user_id=${userId}`);
+          if (!response.ok) throw new Error('Failed to fetch menu items');
           const data = await response.json();
           setMenuItems(data.map(item => ({ ...item, price: parseFloat(item.price) || 0 })));
         } catch (error) {
+          setErrorMessage(error.message);
           console.error('Error fetching menu items:', error);
         }
       }
@@ -34,7 +38,6 @@ const MenuList = () => {
     fetchMenuItems();
   }, [userId]);
 
-  // Function to handle removing an item
   const handleRemove = async (id) => {
     try {
       const response = await fetch(`/api/menu?id=${id}`, {
@@ -42,67 +45,81 @@ const MenuList = () => {
       });
 
       if (response.ok) {
-        setMenuItems((prevItems) => prevItems.filter(item => item.id !== id));
-        setChanges((prevChanges) => {
+        setMenuItems(prevItems => prevItems.filter(item => item.id !== id));
+        setChanges(prevChanges => {
           const newChanges = { ...prevChanges };
           delete newChanges[id]; // Remove deleted item changes
           return newChanges;
         });
       } else {
-        console.error('Failed to delete the item');
+        throw new Error('Failed to delete the item');
       }
     } catch (error) {
+      setErrorMessage(error.message);
       console.error('Error removing item:', error);
     }
   };
 
   const handleAddItem = async (e) => {
     e.preventDefault();
-  
-    // Validate the newItem object
-    if (newItem.dish_name && newItem.price && newItem.image_url) {
-      try {
-        const response = await fetch('/api/menu', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ ...newItem, user_id: userId }),
-        });
-  
-        if (response.ok) {
-          const addedItem = await response.json();
-          const newMenuItem = { ...addedItem, price: parseFloat(addedItem.price) };
-  
-          setMenuItems((prevItems) => [...prevItems, newMenuItem]);
-          setNewItem({ dish_name: '', description: '', price: '', image_url: '' });
-          setShowForm(false);
-        } else {
-          console.error('Failed to add the item');
-        }
-      } catch (error) {
-        console.error('Error adding item:', error);
-      }
-    } else {
-      console.error('Please fill in all fields.');
-    }
-  };
 
-  const handleInputChange = (id, field, value) => {
-    setMenuItems((prevItems) =>
-      prevItems.map((item) => 
-        item.id === id ? { ...item, [field]: value } : item
-      )
-    );
-    
-    setChanges((prevChanges) => ({
-      ...prevChanges,
-      [id]: {
-        ...prevChanges[id],
-        [field]: value,
-      }
-    }));
-  };
+    if (newItem.dish_name && newItem.price && newItem.image) {
+        const formData = new FormData();
+        formData.append('file', newItem.image); // Append the image file
+
+        try {
+            // Start uploading the image
+            const uploadResponse = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
+            });
+
+            // Check if the image upload was successful
+            if (!uploadResponse.ok) throw new Error('Failed to upload image');
+
+            // Get the uploaded image URL from the response
+            const uploadData = await uploadResponse.json();
+            const imageUrl = uploadData.url; // Get the image URL from the response
+
+            // Now, add the menu item to the database
+            const response = await fetch('/api/menu', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ...newItem,
+                    image_url: imageUrl,
+                    user_id: userId,
+                }),
+            });
+
+            // Check if adding the menu item was successful
+            if (response.ok) {
+                const addedItem = await response.json();
+                const newMenuItem = {
+                    ...addedItem,
+                    price: parseFloat(addedItem.price),
+                };
+
+                // Update the state with the new item
+                setMenuItems((prevItems) => [...prevItems, newMenuItem]);
+                // Reset the form inputs
+                setNewItem({ dish_name: '', description: '', price: '', image: null });
+                setShowForm(false); // Hide the form if needed
+                setSuccessMessage('Item successfully added!'); // Show success message
+                setTimeout(() => setSuccessMessage(''), 3000); // Clear success message after 3 seconds
+            } else {
+                throw new Error('Failed to add the item');
+            }
+        } catch (error) {
+            setErrorMessage(error.message); // Set the error message
+            console.error('Error adding item:', error); // Log the error for debugging
+        }
+    } else {
+        setErrorMessage('Please fill in all fields and select an image.'); // Prompt for missing fields
+    }
+};
 
   const handleSaveAllEdits = async () => {
     try {
@@ -120,34 +137,46 @@ const MenuList = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(itemsToUpdate), // Ensure this is an array
+        body: JSON.stringify(itemsToUpdate),
       });
 
       if (response.ok) {
-        setMenuItems((prevItems) => 
+        setMenuItems(prevItems => 
           prevItems.map(item => ({
             ...item,
-            ...changes[item.id], // Update only the changed fields
+            ...changes[item.id],
           }))
         );
-        setIsEditingAll(false); // Set editing state to false
-        setChanges({}); // Clear changes after saving
+        setIsEditingAll(false);
+        setChanges({});
       } else {
-        const errorData = await response.json();
-        console.error('Failed to update items:', errorData);
+        throw new Error('Failed to update items');
       }
     } catch (error) {
+      setErrorMessage(error.message);
       console.error('Error saving changes:', error);
     }
   };
-  
+
+  const handleInputChange = (id, field, value) => {
+    setChanges(prevChanges => ({
+      ...prevChanges,
+      [id]: {
+        ...prevChanges[id],
+        [field]: value,
+      },
+    }));
+  };
+
   return (
     <div>
       <h1>Menu Items</h1>
+      {successMessage && <div className={styles.successMessage}>{successMessage}</div>}
+      {errorMessage && <div className={styles.errorMessage}>{errorMessage}</div>}
       <table className={styles.table}>
         <thead>
           <tr>
-            <th>Si No</th> {/* Changed header to "No" */}
+            <th>Si No</th>
             <th>Image</th>
             <th>Dish Name</th>
             <th>Description</th>
@@ -158,7 +187,7 @@ const MenuList = () => {
         <tbody>
           {menuItems.map((item, index) => (
             <tr key={item.id}>
-              <td>{index + 1}</td> {/* Displaying sequential number */}
+              <td>{index + 1}</td>
               <td>
                 <Image src={item.image_url || "/placeholder-image.jpg"} alt={item.dish_name} width={100} height={100} />
               </td>
@@ -166,7 +195,7 @@ const MenuList = () => {
                 {isEditingAll ? (
                   <input
                     type="text"
-                    value={item.dish_name}
+                    value={changes[item.id]?.dish_name || item.dish_name}
                     onChange={(e) => handleInputChange(item.id, 'dish_name', e.target.value)}
                   />
                 ) : (
@@ -177,7 +206,7 @@ const MenuList = () => {
                 {isEditingAll ? (
                   <input
                     type="text"
-                    value={item.description}
+                    value={changes[item.id]?.description || item.description}
                     onChange={(e) => handleInputChange(item.id, 'description', e.target.value)}
                   />
                 ) : (
@@ -188,10 +217,9 @@ const MenuList = () => {
                 {isEditingAll ? (
                   <input
                     type="text"
-                    value={item.price !== undefined && item.price !== null ? item.price : ''}
+                    value={changes[item.id]?.price !== undefined ? changes[item.id]?.price : item.price}
                     onChange={(e) => {
-                      const newValue = e.target.value; // Get the new input value as a string
-                      // Allow empty input or validate as a number
+                      const newValue = e.target.value;
                       if (newValue === '' || /^\d*\.?\d*$/.test(newValue)) {
                         handleInputChange(item.id, 'price', newValue === '' ? '' : parseFloat(newValue));
                       }
@@ -241,17 +269,22 @@ const MenuList = () => {
             type="number"
             placeholder="Price"
             value={newItem.price}
-            onChange={(e) => setNewItem({ ...newItem, price: e.target.value })}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                setNewItem({ ...newItem, price: value === '' ? '' : parseFloat(value) });
+              }
+            }}
             required
+            step="0.01"
           />
           <input
-            type="text"
-            placeholder="Image URL"
-            value={newItem.image_url}
-            onChange={(e) => setNewItem({ ...newItem, image_url: e.target.value })}
+            type="file"
+            accept="image/*"
+            onChange={(e) => setNewItem({ ...newItem, image: e.target.files[0] })}
             required
           />
-          <button type="submit" className={styles.btn}>Add Menu Item</button>
+          <button type="submit" className={styles.btn}>Add Item</button>
         </form>
       )}
     </div>

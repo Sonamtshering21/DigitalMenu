@@ -169,7 +169,6 @@ export async function PUT(request) {
 */}
 
 import supabase from '../../../lib/subabaseclient'; // Adjust the import path according to your project structure
-
 export async function POST(request) {
     try {
         const newItem = await request.json(); // Expecting the new item data in the request body
@@ -195,11 +194,30 @@ export async function POST(request) {
         // Insert the new menu item into the database
         const { data, error } = await supabase
             .from('menu_items')
-            .insert([{ user_id, dish_name, description, price: parsedPrice, image_url }]);
+            .insert([{ 
+                dish_name, 
+                description, 
+                price: parsedPrice, 
+                image_url, 
+                user_id 
+            }])
+            .select(); // This will return the inserted row(s)
 
+
+        // Log the response for debugging
+        
+      
         if (error) {
             console.error('Error adding menu item:', error);
-            return new Response(JSON.stringify({ error: 'Error adding menu item' }), {
+            return new Response(JSON.stringify({ error: 'Error adding menuuuuuuu item' }), {
+                status: 500,
+                headers: { 'Content-Type': 'application/json' },
+            });
+        }
+
+        // Check if data is null or empty
+        if (!data || data.length === 0) {
+            return new Response(JSON.stringify({ error: 'No item was added to the menu' }), {
                 status: 500,
                 headers: { 'Content-Type': 'application/json' },
             });
@@ -219,6 +237,7 @@ export async function POST(request) {
         });
     }
 }
+
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);

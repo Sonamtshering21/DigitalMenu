@@ -5,6 +5,7 @@ import QRCodeGenerator from '../../components/QRCodeGenerator';
 import Header from '@/components/Header';
 import style from '@/app/qr-codes/qrcode.module.css';
 
+
 const QRCodePage = () => {
   const [numberOfTables, setNumberOfTables] = useState(1); // State for number of tables
   const [generate, setGenerate] = useState(false); // State to trigger QR code generation
