@@ -24,8 +24,8 @@ export default function UserDashboard({ params }) {
 
   useEffect(() => {
     // Check if the user ID from the session matches the URL userId
-    if (session?.user?.id !== userId) {
-      console.error("Access denied: User ID mismatch.");
+    if (Number(session?.user?.id )!== Number(userId)) { 
+      console.error("Access denied: User ID mismatch. happen there");
       return; // Handle access denial here (e.g., redirect or show an error)
     }
 
