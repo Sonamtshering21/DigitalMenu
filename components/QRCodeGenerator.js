@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import QRCode from 'qrcode';
-
 const QRCodeGenerator = ({ numberOfTables, generate, setGenerate }) => {
   const { data: session } = useSession();
   const userId = session?.user?.id; // Get user ID from session
@@ -17,7 +16,7 @@ const QRCodeGenerator = ({ numberOfTables, generate, setGenerate }) => {
 
       for (let i = 1; i <= numberOfTables; i++) {
         try {
-          const url = `https://bhutandigitalmenusystem.netlify.app/menu?user_id=${userId}&table=${i}`;
+          const url = `https://bhutandigitalmenusystem.netlify.app/menus?user_id=${userId}&table=${i}`;
           const canvas = document.createElement('canvas');
 
           await QRCode.toCanvas(canvas, url, {

@@ -19,22 +19,22 @@ const Header = () => {
       <ul>
         {/* Always visible public link */}
         <li>
-          <Link href='/menu' className='hover:text-blue-400'>Menu</Link>
+          <Link href='/menu' className='hover:text-green-300'>Menu</Link>
         </li>
 
       
         {session ? (
           <>
             <li>
-                    <Link href={`/dashboard/${userId}`} className='hover:text-blue-400'>
+                    <Link href={`/dashboard/${userId}`} className='hover:text-green-300'>
                         Company Details
                     </Link>
                 </li>
               <li>
-              <Link href='/admin' className='hover:text-blue-400'>Dashboard</Link>
+              <Link href='/admin' className='hover:text-green-300'>Dashboard</Link>
             </li>
             <li>
-              <Link href='/qr-codes' className='hover:text-blue-400'>QRcode</Link>
+              <Link href='/qr-codes' className='hover:text-green-300'>QRcode</Link>
             </li>
            
            
@@ -52,7 +52,7 @@ const Header = () => {
         ) : ( 
           // If not logged in, show a link to log in
           <li>
-            <Link href='/' className='hover:text-blue-400'>Login</Link>
+            <Link href='/' className='hover:text-green-300'>Login</Link>
           </li>
         )}
       </ul>
