@@ -67,7 +67,7 @@ export default function UserDashboard({ params }) {
         // Wait for 3 seconds after the API call before displaying the form
         setTimeout(() => {
           setIsLoading(false);
-        }, 1000);
+        }, 5);
       }
     };
 
