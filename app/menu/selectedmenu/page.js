@@ -159,39 +159,23 @@ const SelectedMenuPage = () => {
           {submitMessage && <p>{submitMessage}</p>}
 
           {showTokenPrompt && (
-            <div style={{
-              position: 'fixed',
-              top: '80%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              padding: '20px',
-              backgroundColor: '#fff',
-              boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
-              zIndex: 1000,
-              borderRadius: '8px',
-            }}>
-              <h2>Confirm Your Token</h2>
-              <label htmlFor="tokenInput">Enter your token: </label>
+            <div className={styles.tokenPrompt}>
+              <h2 className={styles.tokenPromptTitle}>Confirm Your Token</h2>
+              <label htmlFor="tokenInput" className={styles.tokenPromptLabel}>Enter your token: </label>
               <input
                 type="text"
                 id="tokenInput"
                 value={enteredToken}
-                style={{
-                  border: '0.1rem solid #000',  // Customize color and thickness
-                  borderRadius: '0.2rem',        // Optional: adds rounded corners
-                  padding: '0.5rem',             // Optional: adds padding for better appearance
-                }}
+                className={styles.tokenInput}
                 onChange={(e) => setEnteredToken(e.target.value)}
               />
-              <div style={{ marginTop: '10px' }}>
+              <div className={styles.tokenButtonContainer}>
                 <button className={styles.btn} onClick={handleConfirmToken} disabled={loading}>
                   Confirm
                 </button>
                 <button className={styles.btn} onClick={() => setShowTokenPrompt(false)}>Cancel</button>
               </div>
-              
             </div>
-            
           )}
         </>
       ) : (

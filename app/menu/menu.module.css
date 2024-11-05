@@ -138,3 +138,83 @@
         padding: 0.8rem;
     }
 }
+
+
+
+
+.tokenPrompt {
+    position: fixed;
+    top: 80%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    border-radius: 8px;
+    width: 90%; /* Adjusts width for mobile */
+    max-width: 400px; /* Sets a max width for larger screens */
+    box-sizing: border-box; /* Ensures padding is included in width */
+  }
+  
+  .tokenPromptTitle {
+    font-size: 1.5rem; /* Responsive title size */
+    margin-bottom: 10px;
+    text-align: center; /* Center aligns the title */
+  }
+  
+  .tokenPromptLabel {
+    display: block; /* Block display for better spacing */
+    margin-bottom: 5px;
+  }
+  
+  .tokenInput {
+    border: 0.1rem solid #000;
+    border-radius: 0.2rem;
+    padding: 0.5rem;
+    width: 100%; /* Full width for input */
+    box-sizing: border-box; /* Ensures padding is included in width */
+    margin-bottom: 10px; /* Adds space below the input */
+  }
+  
+  .tokenButtonContainer {
+    display: flex; /* Flexbox for button layout */
+    justify-content: space-between; /* Space between buttons */
+  }
+  
+  .btn {
+    background-color: #4CAF50; /* Button color */
+    color: white; /* Button text color */
+    padding: 10px 15px;
+    border: none; /* Removes default border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Changes cursor on hover */
+    flex: 1; /* Allows buttons to grow equally */
+    margin: 0 5px; /* Margin between buttons */
+    transition: background-color 0.3s; /* Smooth transition for hover */
+  }
+  
+  .btn:hover {
+    background-color: #45a049; /* Darker shade on hover */
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .tokenPrompt {
+      width: 95%; /* Slightly wider on smaller devices */
+      padding: 15px; /* Reduced padding */
+    }
+  
+    .tokenPromptTitle {
+      font-size: 1.3rem; /* Smaller title size for mobile */
+    }
+  
+    .tokenInput {
+      padding: 0.4rem; /* Smaller padding for mobile input */
+    }
+  
+    .btn {
+      padding: 8px; /* Smaller button padding for mobile */
+    }
+  }
+  
