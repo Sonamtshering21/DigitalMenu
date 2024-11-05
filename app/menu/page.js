@@ -189,7 +189,7 @@ const MenuPage = () => {
                     <ul>
                         {selectedItems.map(selected => (
                             <li key={selected.id}>
-                                {selected.dish_name} - Quantity: {selected.quantity}
+                                {selected.dish_name} - : {selected.quantity}
                             </li>
                         ))}
                     </ul>
@@ -198,7 +198,7 @@ const MenuPage = () => {
 
             <button type="button" className={styles.btn} onClick={handleSubmit}>View</button>
             <div>
-                <label htmlFor="tokenId">Order Status:</label>
+                <label htmlFor="tokenId"><strong>Order Status:</strong></label>
                 <input
                     type="text"
                     id="tokenId"

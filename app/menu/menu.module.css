@@ -7,7 +7,7 @@
     background: white;
     height: 100%;
     width: 100%;
-    gap: 1rem;
+    gap: 0.5rem;
     margin-top: 0.2rem;
 }
 .table {
@@ -46,7 +46,6 @@
     padding: 1rem;
     background-color: #C21E56;
     color:white;
-    max-width: 100%;
     width: 100%;
 }
 
@@ -86,7 +85,7 @@
   }
   @media (max-width: 768px) {
     .menuarea {
-        padding: 1rem;
+        padding: 0.5rem;
     }
 
     .table {
@@ -101,8 +100,8 @@
     }
 
     .btn {
-        width: 100%; /* Full width buttons */
-        padding: 1rem;
+        width: 60%; /* Full width buttons */
+        padding: 0.1rem;
     }
 
     .des, .selectedmenu {
