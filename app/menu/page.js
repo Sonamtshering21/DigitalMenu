@@ -152,7 +152,7 @@ const MenuPage = () => {
                         <th>Image</th>
                         <th>Dish Name</th>
                         <th>Description</th>
-                        <th>Quantity</th>
+                        <th className={styles.quantity}>Quantity</th>
                         <th>Price</th>
                         <th>Action</th>
                     </tr>
@@ -168,14 +168,14 @@ const MenuPage = () => {
                             </td>
                             <td>{item.description}</td>
                             <td>
-                                <input type="number" min="1" defaultValue="1" id={`quantity-${item.id}`} />
+                                <input type="number" min="1" defaultValue="1" id={`quantity-${item.id}`}  />
                             </td>
                             <td>${item.price.toFixed(2)}</td>
                             <td>
                                 <button onClick={() => {
                                     const quantity = parseInt(document.getElementById(`quantity-${item.id}`).value) || 1;
                                     handleAddToOrder(item, quantity);
-                                }}>+</button>
+                                }} >+</button>
                             </td>
                         </tr>
                     ))}
