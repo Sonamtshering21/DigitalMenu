@@ -197,7 +197,8 @@ const MenuPage = () => {
             )}
 
             <button type="button" className={styles.btn} onClick={handleSubmit}>View</button>
-            <div>
+            <div className={styles.trackercss}>
+                <>
                 <label htmlFor="tokenId"><strong>Order Status:</strong></label>
                 <input
                     type="text"
@@ -206,8 +207,10 @@ const MenuPage = () => {
                     onChange={(e) => setTokenId(e.target.value)} // Use setTokenId directly
                     placeholder="Enter your token ID"
                     required
+                    className="border border-gray-300 rounded-lg p-2 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
                 />
-                <button type="button" className={styles.btn} onClick={handleSubmittoken}>
+                </>
+                <button type="button" className={styles.btn} onClick={handleSubmittoken} >
                     Track Order
                 </button>
             </div> 

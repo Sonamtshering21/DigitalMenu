@@ -68,10 +68,9 @@
     text-decoration: none; /* No underline */
     display: inline-block; /* Align inline */
     
-    margin: 10px 10px; /* Margin around button */
-    cursor: pointer; /* Pointer cursor on hover */
-    border-radius: 5px; /* Rounded corners */
    
+    cursor: pointer; /* Pointer cursor on hover */
+    border-radius: 5px; /* Rounded corners */   
   }
 
   .recal{
@@ -93,15 +92,27 @@
         font-size: 0.9rem;
         border-collapse: collapse;
     }
+    .ordercss{
+        margin-bottom: 1rem;
+    }
+  
 
     .table th, .table td {
         padding: 0.5rem;
         word-break: break-word; /* Break long words or text within cells */
     }
+    .trackercss{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 0.7rem;
+    }
 
     .btn {
         width: 60%; /* Full width buttons */
         padding: 0.1rem;
+        margin-top: 1rem;
     }
 
     .des, .selectedmenu {
