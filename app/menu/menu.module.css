@@ -8,6 +8,7 @@
     height: 100%;
     width: 100%;
     gap: 1rem;
+    margin-top: 0.2rem;
 }
 .table {
     max-width: 85rem;
@@ -34,10 +35,9 @@
 .des{
     display: flex;
     flex-direction: column;
-   gap: 0.2rem;
-   padding: 1rem;
-
-   background-color: rgb(224, 127, 127);
+    gap: 0.2rem;
+    padding: 1rem;
+    background-color: #C21E56;
     color:white;
     max-width: 100%;
     width: 100%;
@@ -66,4 +66,10 @@
     cursor: pointer; /* Pointer cursor on hover */
     border-radius: 5px; /* Rounded corners */
    
+  }
+
+  .recal{
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }

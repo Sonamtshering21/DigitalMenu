@@ -224,7 +224,7 @@ const MenuPage = () => {
 };
 
 const WrappedMenuPage = () => (
-  <Suspense fallback={<div>Loading...</div>}>
+  <Suspense fallback={<div className='styles.recal'>Loading...</div>}>
       <MenuPage />
   </Suspense>
 );
