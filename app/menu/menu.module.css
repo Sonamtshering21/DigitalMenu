@@ -73,3 +73,57 @@
     justify-content: center;
     align-items: center;
   }
+
+  @media (max-width: 768px) {
+    .menuarea {
+        padding: 1rem; /* Add padding for small screens */
+    }
+
+    .table {
+        width: 90%; /* Reduce table width for mobile */
+        margin: 0 auto; /* Center the table */
+        font-size: 0.9rem; /* Reduce font size for tables */
+        border-collapse: collapse; /* Ensure the borders are collapsed */
+    }
+
+    .btn {
+        width: 50%; /* Full width buttons on small screens */
+        padding: 1rem; /* Increase padding */
+    }
+
+    .des {
+        padding: 0.5rem; /* Adjust padding for smaller screens */
+    }
+
+    .selectedmenu {
+        padding: 0.5rem; /* Adjust padding */
+        gap: 0.5rem; /* Increase gap */
+    }
+
+    .table td input[type="number"] {
+        max-width: 30px; /* Set a maximum width for the input */
+        width: 100%; /* Allow the input to take the full width of the cell */
+        padding: 0.3rem; /* Add some padding for better touch/click area */
+        box-sizing: border-box; /* Ensure padding is included in the width */
+    }
+}
+
+@media (max-width: 480px) {
+    .menuarea {
+        flex-direction: column; /* Stack items in column on very small screens */
+    }
+
+    .table {
+        width: 95%; /* Further reduce table width for very small screens */
+        margin: 0 auto; /* Ensure the table remains centered */
+    }
+
+    .table th,
+    .table td {
+        font-size: 0.8rem; /* Further reduce font size for readability */
+    }
+
+    .btn {
+        padding: 0.8rem; /* Adjust button padding for smaller screens */
+    }
+}
