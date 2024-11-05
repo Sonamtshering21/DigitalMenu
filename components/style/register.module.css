@@ -1,0 +1,116 @@
+/* register.module.css */
+
+.container {
+    display: grid;
+    place-items: center;
+    height: 100vh;
+    padding: 0 1rem; /* Add padding for mobile */
+  }
+  
+  .card {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    border-top: 4px solid #38a169; /* green-400 */
+    background-color: white;
+    max-width: 400px; /* Width for larger screens */
+    width: 100%; /* Responsive */
+    border-radius: 0.5rem; /* Rounded corners */
+  }
+  
+  .title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 1rem 0;
+    text-align: center;
+    color: #2d3748; /* gray-800 */
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* Space between inputs */
+  }
+  
+  .input {
+    border: 1px solid #d1d5db; /* gray-300 */
+    border-radius: 0.5rem; /* Rounded corners */
+    padding: 0.5rem; /* Padding inside inputs */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .input:focus {
+    border-color: #38a169; /* green-500 */
+    outline: none;
+    box-shadow: 0 0 0 1px rgba(56, 175, 105, 0.5); /* green-500 */
+  }
+  
+  .submitButton {
+    background-color: #38a169; /* green-600 */
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0.5rem 1.5rem; /* Padding for the button */
+    border-radius: 0.5rem; /* Rounded corners */
+    transition: background-color 0.2s ease;
+  }
+  
+  .submitButton:hover {
+    background-color: #48bb78; /* green-500 */
+  }
+  
+  .error {
+    background-color: #e53e3e; /* red-500 */
+    color: white;
+    width: fit-content;
+    font-size: 0.875rem; /* text-sm */
+    padding: 0.25rem 0.5rem; /* Padding for error message */
+    border-radius: 0.375rem; /* Rounded corners */
+    margin-top: 0.5rem; /* Margin for spacing */
+  }
+  
+  .success {
+    background-color: #48bb78; /* green-500 */
+    color: white;
+    width: fit-content;
+    font-size: 0.875rem; /* text-sm */
+    padding: 0.25rem 0.5rem; /* Padding for success message */
+    border-radius: 0.375rem; /* Rounded corners */
+    margin-top: 0.5rem; /* Margin for spacing */
+  }
+  
+  .link {
+    font-size: 0.875rem; /* text-sm */
+    margin-top: 1rem;
+    text-align: right;
+    color: #4a5568; /* gray-600 */
+    text-decoration: none; /* Remove underline */
+  }
+  
+  .link:hover {
+    color: #38a169; /* green-600 */
+  }
+  
+  .underline {
+    text-decoration: underline;
+  }
+  
+  /* Mobile Responsiveness */
+  @media (max-width: 768px) {
+    .container {
+      padding: 0 1rem; /* Ensure padding for small screens */
+    }
+    .card {
+      padding: 1.5rem; /* Adjust padding for smaller devices */
+      max-width: 90%; /* Make the card responsive */
+    }
+    .title {
+      font-size: 1.5rem; /* Smaller title for mobile */
+    }
+    .input {
+      padding: 0.75rem; /* Increase padding for easier touch */
+    }
+    .submitButton {
+      padding: 0.5rem; /* Adjust button padding */
+    }
+  }
+  
