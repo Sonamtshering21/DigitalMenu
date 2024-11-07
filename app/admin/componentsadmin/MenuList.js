@@ -195,7 +195,7 @@ const MenuList = () => {
                 {isEditingAll ? (
                   <input
                     type="text"
-                    value={changes[item.id]?.dish_name || item.dish_name}
+                    value={changes[item.id]?.dish_name !== undefined ? changes[item.id].dish_name : item.dish_name}
                     onChange={(e) => handleInputChange(item.id, 'dish_name', e.target.value)}
                   />
                 ) : (
@@ -206,7 +206,7 @@ const MenuList = () => {
                 {isEditingAll ? (
                   <input
                     type="text"
-                    value={changes[item.id]?.description || item.description}
+                    value={changes[item.id]?.description !== undefined ? changes[item.id].description : item.description}
                     onChange={(e) => handleInputChange(item.id, 'description', e.target.value)}
                   />
                 ) : (
