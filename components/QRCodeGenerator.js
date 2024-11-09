@@ -1,10 +1,10 @@
-// app/components/QRCodeGenerator.js
 'use client'; // Ensure this component runs on the client side
 
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import QRCode from 'qrcode';
+
 const QRCodeGenerator = ({ numberOfTables, generate, setGenerate }) => {
   const { data: session } = useSession();
   const userId = session?.user?.id; // Get user ID from session
@@ -19,9 +19,14 @@ const QRCodeGenerator = ({ numberOfTables, generate, setGenerate }) => {
           const url = `https://bhutandigitalmenusystem.netlify.app/menu?user_id=${userId}&table=${i}`;
           const canvas = document.createElement('canvas');
 
+          // Modify the QR code generation to use a mix of green and rose red
           await QRCode.toCanvas(canvas, url, {
             width: 200,
             margin: 2,
+            color: {
+              dark: '#28a745', // Green color
+              light: '#d5006d', // Rose red color
+            },
           });
 
           const dataUrl = canvas.toDataURL(); // Convert the canvas to a data URL
