@@ -136,7 +136,7 @@ const TokenPage = () => {
 
             {/* Display Total Price */}
             <p>
-                <strong>Status:</strong> {order.order_status === "N/A" ? 'Pending' : 'Approved'}
+                <strong>Status:</strong> {order.order_status === "N/A" ? 'Pending' : '✅Approved'}
             </p>
             {order.order_status === 'Confirmed' ? (
                 <p>Progress: {order.order_progress === "N/A" ? 'Preparing' : 'Ready to Eat'}</p>
@@ -158,7 +158,7 @@ const TokenPage = () => {
                     </tr>
                 </tbody>
             </table>
-            <p>{order.payment_status=='Confirmed' ? 'Thank you for dining at our restaurant! We hope you enjoyed your meal and look forward to welcoming you back soon!' : null}</p>
+            <p>{order.payment_status=='Confirmed' ? 'Thank you for dining at our restaurant! We hope you enjoyed our meal and look forward to welcoming you back soon!' : null}</p>
 
             <button onClick={() => router.back()} className={styles.btn}>Go Back</button>
         </div>
