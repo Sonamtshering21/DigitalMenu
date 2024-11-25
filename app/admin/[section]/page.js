@@ -2,6 +2,7 @@
 import OrderedList from '../componentsadmin/OrderedList';
 import MenuList from '../componentsadmin/MenuList'
 import PaymentList from '../componentsadmin/PaymentList'
+import styles from '@/app/admin/admin.module.css'
 // import other components as needed
 
 export default function SectionPage({ params }) {
@@ -22,9 +23,13 @@ export default function SectionPage({ params }) {
     };
 
     return (
-        <div>
-            <h1>{section.replace(/([A-Z])/g, ' $1')}</h1>
-            {renderContent()}
+        <div className={styles.pageContainer}>
+            <h1 className={styles.pageTitle}>
+                {section.replace(/([A-Z])/g, ' $1')}
+            </h1>
+            <div className={styles.contentContainer}>
+                {renderContent()}
+            </div>
         </div>
     );
 }

@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from 'react';
-import Header from '@/components/Header'; // Import your Header component
+import Header from '@/components/Header'; 
 import style from '../dashboard.module.css';
 
 export default function UserDashboard({ params }) {
@@ -19,25 +19,20 @@ export default function UserDashboard({ params }) {
   const [errors, setErrors] = useState({});
   const [userData, setUserData] = useState(null); // User data state
   const [companyDetails, setCompanyDetails] = useState(null); // Company data state
-  const [isSubmitted, setIsSubmitted] = useState(false); // Track submission status
   const [isLoading, setIsLoading] = useState(true); // Loading state for API check
 
   useEffect(() => {
-    // Check if the user ID from the session matches the URL userId
-    if (Number(session?.user?.id )!== Number(userId)) { 
-      console.error("Access denied: User ID mismatch. happen there");
+    if (Number(session?.user?.id) !== Number(userId)) {
+      console.error("Access denied: User ID mismatch.");
       return; // Handle access denial here (e.g., redirect or show an error)
     }
 
-    // Fetch user-specific data here
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/user/${userId}`); // Replace with your API endpoint
-        if (!response.ok) {
-          throw new Error('Failed to fetch user data');
-        }
+        const response = await fetch(`/api/user/${userId}`);
+        if (!response.ok) throw new Error('Failed to fetch user data');
         const data = await response.json();
-        setUserData(data); // Set user data
+        setUserData(data);
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -55,19 +50,12 @@ export default function UserDashboard({ params }) {
         if (!response.ok) throw new Error('Failed to fetch company details');
 
         const data = await response.json();
-        if (data && data.user_id) {
-          setCompanyDetails(data);
-        } else {
-          setCompanyDetails(null); // Reset company details if no user_id found
-        }
+        setCompanyDetails(data?.user_id ? data : null);
       } catch (error) {
         console.error('Error fetching company details:', error);
-        setCompanyDetails(null); // Set to null to show the form
+        setCompanyDetails(null);
       } finally {
-        // Wait for 3 seconds after the API call before displaying the form
-        setTimeout(() => {
-          setIsLoading(false);
-        },1);
+        setIsLoading(false);
       }
     };
 
@@ -76,17 +64,16 @@ export default function UserDashboard({ params }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData((prevData) => ({
+      ...prevData,
       [name]: value,
-    });
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = {};
 
-    // Validation
     if (!formData.companyName) validationErrors.companyName = 'Company name is required.';
     if (!formData.address) validationErrors.address = 'Address is required.';
     if (!formData.contactInfo) validationErrors.contactInfo = 'Contact info is required.';
@@ -104,10 +91,8 @@ export default function UserDashboard({ params }) {
         return;
       }
 
-      // Add userId to the form data
       const requestData = { ...formData, userId };
 
-      // Send data to the API
       const response = await fetch('/api/dashboard', {
         method: 'POST',
         headers: {
@@ -121,10 +106,18 @@ export default function UserDashboard({ params }) {
       }
 
       const result = await response.json();
-      console.log(result.message); // Handle success message
+      console.log(result.message);
 
-      // Clear form and mark as submitted
-      setIsSubmitted(true);
+      // Update company details and clear form
+      setCompanyDetails({
+        user_id: userId,
+        company_name: formData.companyName,
+        address: formData.address,
+        contact_info: formData.contactInfo,
+        description: formData.description,
+        social_links: formData.socialLinks,
+        created_at: new Date().toISOString(),
+      });
       setFormData({
         companyName: '',
         address: '',
@@ -138,7 +131,7 @@ export default function UserDashboard({ params }) {
     }
   };
 
-  const createdAt = companyDetails && companyDetails.created_at
+  const createdAt = companyDetails?.created_at
     ? new Date(companyDetails.created_at).toISOString().split('T')[0]
     : null;
 
@@ -154,7 +147,7 @@ export default function UserDashboard({ params }) {
         {userData && (
           <div>
             <h2>User Data:</h2>
-            <pre>{JSON.stringify(userData, null, 2)}</pre> {/* Display fetched user data */}
+            <pre>{JSON.stringify(userData, null, 2)}</pre>
           </div>
         )}
 
@@ -170,91 +163,79 @@ export default function UserDashboard({ params }) {
             <p><strong>Account Created on:</strong> {createdAt}</p>
           </div>
         ) : (
-          !isLoading && ( // Show form only if not loading
-            <div>
+          !isLoading && (
+            <div className={style.dashboardsection}>
               <h2>No Company Details Found, Please Provide Them:</h2>
-              <div className={style.dashboardsection}>
-                <div className={style.admindashboard}>
-                  <h2>Please Complete the below process to avail the service:</h2>
-                  {!isSubmitted ? (
-                    <form onSubmit={handleSubmit}>
-                      <div>
-                        <label htmlFor="companyName">
-                          Company Name / Restaurant Name *
-                          <input
-                            type="text"
-                            id="companyName"
-                            name="companyName"
-                            value={formData.companyName}
-                            onChange={handleChange}
-                            required
-                          />
-                          {errors.companyName && <p className={style.error}>{errors.companyName}</p>}
-                        </label>
-                      </div>
-                      <div>
-                        <label htmlFor="address">
-                          Address of the Company *
-                          <input
-                            type="text"
-                            id="address"
-                            name="address"
-                            value={formData.address}
-                            onChange={handleChange}
-                            required
-                          />
-                          {errors.address && <p className={style.error}>{errors.address}</p>}
-                        </label>
-                      </div>
-                      <div>
-                        <label htmlFor="contactInfo">
-                          Contact Info of the Company *
-                          <input
-                            type="text"
-                            id="contactInfo"
-                            name="contactInfo"
-                            value={formData.contactInfo}
-                            onChange={handleChange}
-                            required
-                          />
-                          {errors.contactInfo && <p className={style.error}>{errors.contactInfo}</p>}
-                        </label>
-                      </div>
-                      <div>
-                        <label htmlFor="description">
-                          Description of the Company *
-                          <textarea
-                            id="description"
-                            name="description"
-                            value={formData.description}
-                            onChange={handleChange}
-                            required
-                          />
-                          {errors.description && <p className={style.error}>{errors.description}</p>}
-                        </label>
-                      </div>
-                      <div>
-                        <label htmlFor="socialLinks">
-                          Link/Website/TikTok/Social Media
-                          <input
-                            type="text"
-                            id="socialLinks"
-                            name="socialLinks"
-                            value={formData.socialLinks}
-                            onChange={handleChange}
-                          />
-                        </label>
-                      </div>
-                      <button type="submit">Submit</button>
-                    </form>
-                  ) : (
-                    <div>
-                      <p>Submission Successful!</p>
-                      <button disabled>Edit</button> {/* Edit button is disabled */}
-                    </div>
-                  )}
+              <form onSubmit={handleSubmit}>
+                <div>
+                  <label htmlFor="companyName">
+                    Company Name / Restaurant Name *
+                    <input
+                      type="text"
+                      id="companyName"
+                      name="companyName"
+                      value={formData.companyName}
+                      onChange={handleChange}
+                      required
+                    />
+                    {errors.companyName && <p className={style.error}>{errors.companyName}</p>}
+                  </label>
                 </div>
-              </div>
+                <div>
+                  <label htmlFor="address">
+                    Address of the Company *
+                    <input
+                      type="text"
+                      id="address"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleChange}
+                      required
+                    />
+                    {errors.address && <p className={style.error}>{errors.address}</p>}
+                  </label>
+                </div>
+                <div>
+                  <label htmlFor="contactInfo">
+                    Contact Info of the Company *
+                    <input
+                      type="text"
+                      id="contactInfo"
+                      name="contactInfo"
+                      value={formData.contactInfo}
+                      onChange={handleChange}
+                      required
+                    />
+                    {errors.contactInfo && <p className={style.error}>{errors.contactInfo}</p>}
+                  </label>
+                </div>
+                <div>
+                  <label htmlFor="description">
+                    Description of the Company *
+                    <textarea
+                      id="description"
+                      name="description"
+                      value={formData.description}
+                      onChange={handleChange}
+                      required
+                    />
+                    {errors.description && <p className={style.error}>{errors.description}</p>}
+                  </label>
+                </div>
+                <div>
+                  <label htmlFor="socialLinks">
+                    Link/Website/TikTok/Social Media
+                    <input
+                      type="text"
+                      id="socialLinks"
+                      name="socialLinks"
+                      value={formData.socialLinks}
+                      onChange={handleChange}
+                    />
+                  </label>
+                </div>
+                <button type="submit">Submit</button>
+              </form>
             </div>
           )
         )}

@@ -20,7 +20,7 @@ const QRCodeGenerator = ({ numberOfTables, generate, setGenerate }) => {
           const canvas = document.createElement('canvas');
 
           await QRCode.toCanvas(canvas, url, {
-            width: 200,
+            width: 20,
             margin: 2,
           });
 
