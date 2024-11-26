@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect } from 'react';
 import Header from '@/components/Header'; 
 import style from '../dashboard.module.css';
-
+import Image from "next/image";
 export default function UserDashboard({ params }) {
   const { userId } = params; // Get userId from the URL parameters
   const { data: session } = useSession();
@@ -153,6 +153,7 @@ export default function UserDashboard({ params }) {
 
         {companyDetails ? (
           <div className={style.details}>
+            <Image src="/correct.png" alt="img" width={30} height={30} />
             <h1><strong>Company Details</strong></h1>
             <p><strong>Company ID:</strong> {companyDetails.user_id}</p>
             <p><strong>Company Name:</strong> {companyDetails.company_name}</p>
@@ -164,12 +165,12 @@ export default function UserDashboard({ params }) {
           </div>
         ) : (
           !isLoading && (
-            <div className={style.dashboardsection}>
+            <div className={style.admindashboard}>
               <h2>No Company Details Found, Please Provide Them:</h2>
               <form onSubmit={handleSubmit}>
                 <div>
                   <label htmlFor="companyName">
-                    Company Name / Restaurant Name *
+                    Company Name / Restaurant Name: <span>* </span>
                     <input
                       type="text"
                       id="companyName"
@@ -183,7 +184,7 @@ export default function UserDashboard({ params }) {
                 </div>
                 <div>
                   <label htmlFor="address">
-                    Address of the Company *
+                    Address of the Company <span>*</span>
                     <input
                       type="text"
                       id="address"
@@ -197,7 +198,7 @@ export default function UserDashboard({ params }) {
                 </div>
                 <div>
                   <label htmlFor="contactInfo">
-                    Contact Info of the Company *
+                    Contact Info of the Company <span>*</span>
                     <input
                       type="text"
                       id="contactInfo"
@@ -211,7 +212,7 @@ export default function UserDashboard({ params }) {
                 </div>
                 <div>
                   <label htmlFor="description">
-                    Description of the Company *
+                    Description of the Company <span>*</span>
                     <textarea
                       id="description"
                       name="description"

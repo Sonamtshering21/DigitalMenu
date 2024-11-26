@@ -40,7 +40,7 @@
   .admindashboard button {
     margin-top: 15px;
     padding: 10px;
-    background-color: #0070f3;
+    background-color:rgb(17, 167, 17);
     color: white;
     border: none;
     border-radius: 4px;
@@ -64,11 +64,13 @@
   gap: 3rem;
   border-radius: 0.5rem;
 }
- 
 .successsub p{
   color: green;
 }
 .successsub h1{
   color: red;
   font-size: 1.5rem;
+}
+.admindashboard span{
+  color: red;
 }

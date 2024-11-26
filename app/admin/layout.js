@@ -7,8 +7,12 @@ import styles from './admin.module.css';
 const AdminLayout = ({ children }) => {
   return (
     <div className={styles.container}> {/* Use the container class here */}
-      <Header />
+      
       <Sidebar />
+      <div className={styles.headersec}>
+      <Header />
+      </div>
+
       <div className={styles.innerdisplay}>
         {children}
       </div>

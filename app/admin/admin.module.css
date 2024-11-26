@@ -1,29 +1,28 @@
+
 .sidebar {
   width: 5rem; /* Adjust width as needed */
-  max-width: 15rem;
-  background-color: green;
-  padding: 2rem;
-  position: absolute; /* Sidebar scrolls with the page */
-  top: 0; /* Aligns the sidebar to the top */
-  left: 0; /* Aligns the sidebar to the left */
-  min-height: 50vh; /* Ensure it at least covers the full viewport height */
-  
-  border-right: 1px solid #ddd;
+  max-width: 15rem; /* Optional: restrict maximum width */
+  padding: 2rem; /* Padding inside the sidebar */
+  position: fixed; /* Sidebar scrolls with the page */
+  top: 0; /* Align the sidebar to the top */
+  left: 0; /* Align the sidebar to the left */
+  border-right: 1px solid #ddd; /* Optional: visual border */
+  min-height: 100%; /* Ensures full height relative to the parent */
 }
-
   /*layout css*/
  /* admin.module.css */
 
 .container {
     display: flex; /* Use flexbox for layout */
     flex-direction: column;
+    min-height: 100%;
 }
 
 .sidebar {
-    margin-top: 3.5rem;
     width: 250px; /* Set a fixed width for the sidebar */
+    padding-top: 9rem;
     background-color: #f0f0f0; /* Background color for sidebar */
-    height: 100%; /* Full height for sidebar */
+    min-height: 100%;
 }
 
 .innerdisplay {
@@ -101,9 +100,17 @@
 /* SectionPage.module.css */
 .pageContainer {
   /* Set the entire page's background to white */
-  min-height: 80vh; /* Ensure it covers the full viewport height */
+  position: relative;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center; /* Center align the content horizontally */
 }
 
+.contentContainer{
+  height: 100%;
+  position: relative;
+}
+.headersec{
+  position: relative;
+}
