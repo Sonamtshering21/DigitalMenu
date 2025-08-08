@@ -3,7 +3,7 @@ import { AuthProvider } from './Providers'; // Ensure this is set up properly
 import { SelectedItemsProvider } from './context/SelectedItemsContext';
 import { Outfit } from 'next/font/google';
 
-
+# To test 
 import "./globals.css";
 
 // Use the correct property for weight
